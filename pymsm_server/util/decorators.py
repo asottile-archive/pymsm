@@ -21,7 +21,6 @@ def require_internal(func=_NONE_PASSED):
     Args:
         func - Function to be wrapped. If it is none this was just called
             directly and should just check the assertion.
-
     """
     if func is _NONE_PASSED:
         if flask.request.remote_addr != '127.0.0.1':
