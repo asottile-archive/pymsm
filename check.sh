@@ -58,6 +58,7 @@ check_python_module coverage
 check_python_module json
 check_python_module flask
 check_python_module testify
+check_python_module mock
 
 exit $exit_ret
 
