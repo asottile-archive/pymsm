@@ -46,5 +46,20 @@ class TestRequireInternal(T.TestCase):
         ):
             require_internal(callable)()
 
+    def test_non_decorator_with_internal_ip(self):
+        """Tests that the non-decorator version of this call allows localhost.
+        """
+        mock_request = self._get_fake_request()
+        with mock.patch.object(flask, 'request', mock_request):
+            require_internal()
+
+    def test_non_decorator_with_external_ip(self):
+       mock_request = self._get_fake_request('192.168.0.1')
+       with contextlib.nested(
+           mock.patch.object(flask, 'request', mock_request),
+           T.assert_raises(werkzeug.exceptions.Forbidden),
+       ):
+           require_internal()
+
 if __name__ == '__main__':
     T.run()
