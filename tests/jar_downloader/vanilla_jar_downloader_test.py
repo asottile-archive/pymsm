@@ -1,11 +1,14 @@
 
 import contextlib
 import mock
+import os.path
 import simplejson
 import testify as T
 import urllib2
 
+import jar_downloader.vanilla_jar_downloader
 from jar_downloader.vanilla_jar_downloader import get_versions_json
+from jar_downloader.vanilla_jar_downloader import LATEST_FILE
 from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
 from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
 
@@ -30,6 +33,7 @@ class TestGetVersionsJson(T.TestCase):
     @T.suite('integration')
     @T.suite('external')
     def test_structure_of_external_json(self):
+        """A smoke test of the json data returned from the version service."""
         json_object = get_versions_json()
 
         T.assert_equal(
@@ -57,4 +61,24 @@ class TestGetVersionsJson(T.TestCase):
             )
 
 class TestVanillaJarDownloader(T.TestCase):
-    pass
+    """Tests the vanilla jar downloader."""
+
+    @T.setup_teardown
+    def patch_out_base_init_verifying_directory(self):
+        def fake_init(fakeself, jar_directory):
+            """A fake init method to bypass os.path.exists check."""
+            fakeself.jar_directory = jar_directory
+
+        with mock.patch.object(
+            jar_downloader.vanilla_jar_downloader.JarDownloaderBase,
+            '__init__',
+            fake_init,
+        ):
+            yield
+
+    def test_latest_filename(self):
+        path = str(object())
+        T.assert_equal(
+            VanillaJarDownloader(path)._latest_filename,
+            os.path.join(path, LATEST_FILE)
+        )
