@@ -1,5 +1,6 @@
 
 import collections
+import os.path
 
 class Jar(collections.namedtuple('Jar', ['filename', 'short_version'])):
     """A Jar represents a single file of a jar inside the jar_directory.
@@ -24,6 +25,7 @@ class JarDownloaderBase(object):
             jar_directory - Directory where the jars will be downloaded to and
                 managed.
         """
+        assert os.path.exists(jar_directory)
         self.jar_directory = jar_directory
 
     @property
