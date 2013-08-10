@@ -34,12 +34,17 @@ TESTS = [
     Test(
         "%s | xargs grep 'import\sipdb'" % PY_FILES,
         'Py    - ipdb',
-        True, 'testipdby',
+        True, 'testipdb',
     ),
     Test(
         "%s | xargs grep -H -n -P '\t'" % ALL_FILES,
         "All   - No tabs",
         True, 'testtabs',
+    ),
+    Test(
+        "testify tests",
+        "Py    - Tests",
+        False, 'testtests',
     ),
 ]
 
