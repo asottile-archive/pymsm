@@ -6,8 +6,8 @@ import os.path
 import simplejson
 import urllib2
 
-from pymsm_server.jar_downloader.jar_downloader_base import Jar
-from pymsm_server.jar_downloader.jar_downloader_base import JarDownloaderBase
+from jar_downloader.jar_downloader_base import Jar
+from jar_downloader.jar_downloader_base import JarDownloaderBase
 
 VERSIONS_ENDPOINT = 'https://s3.amazonaws.com/Minecraft.Download/versions/versions.json'
 DOWNLOAD_PATH = 'https://s3.amazonaws.com/Minecraft.Download/versions/{version}/minecraft_server.{version}.jar'

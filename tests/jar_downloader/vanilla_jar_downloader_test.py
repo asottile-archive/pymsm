@@ -5,9 +5,9 @@ import simplejson
 import testify as T
 import urllib2
 
-from pymsm_server.jar_downloader.vanilla_jar_downloader import get_versions_json
-from pymsm_server.jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
-from pymsm_server.jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
+from jar_downloader.vanilla_jar_downloader import get_versions_json
+from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
+from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
 
 class TestGetVersionsJson(T.TestCase):
     """Tests the get_versions_json method."""

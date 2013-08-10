@@ -1,6 +1,6 @@
 import testify as T
 
-from pymsm_server.util.natural_sort import natural_sort
+from util.natural_sort import natural_sort
 
 class TestNaturalSort(T.TestCase):
     expected = [

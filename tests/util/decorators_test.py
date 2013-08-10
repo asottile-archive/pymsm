@@ -6,8 +6,7 @@ import mock
 import testify as T
 import werkzeug.exceptions
 
-
-from pymsm_server.util.decorators import require_internal
+from util.decorators import require_internal
 
 class TestRequireInternal(T.TestCase):
     """Tests the @require_internal decorator."""

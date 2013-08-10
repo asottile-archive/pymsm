@@ -2,7 +2,7 @@
 import flask
 import threading
 
-from pymsm_server.util.decorators import require_internal
+from util.decorators import require_internal
 
 app = flask.Flask(__name__)
 
