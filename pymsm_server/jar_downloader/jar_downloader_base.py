@@ -27,15 +27,15 @@ class JarDownloaderBase(object):
         self.jar_directory = jar_directory
 
     @property
-    def latest_downloaded_version(self):
-        """Implement to return a Jar object of the latest downloaded version."""
-        raise NotImplementedError
-
-    @property
     def downloaded_versions(self):
         """Implement to return an iterable of Jar objects representing the
         downloaded jars for this JarDownloader.
         """
+        raise NotImplementedError
+
+    @property
+    def latest_downloaded_version(self):
+        """Implement to return a Jar object of the latest downloaded version."""
         raise NotImplementedError
 
     @property
