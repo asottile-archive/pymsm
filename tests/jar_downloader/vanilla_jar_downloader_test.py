@@ -2,6 +2,7 @@
 import __builtin__
 
 import contextlib
+import fnmatch
 import mock
 import os.path
 import simplejson
@@ -10,10 +11,14 @@ import urllib2
 
 from jar_downloader.jar_downloader_base import Jar
 import jar_downloader.vanilla_jar_downloader
+from jar_downloader.vanilla_jar_downloader import DOWNLOAD_PATH
 from jar_downloader.vanilla_jar_downloader import get_versions_json
 from jar_downloader.vanilla_jar_downloader import InvalidVersionFileError
+from jar_downloader.vanilla_jar_downloader import JAR_FILENAME
+from jar_downloader.vanilla_jar_downloader import JAR_MATCH
 from jar_downloader.vanilla_jar_downloader import LATEST_FILE
 from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
+from jar_downloader.vanilla_jar_downloader import VERSION_REGEX
 from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
 from testing.assertions.version_json import assert_json_structure
 from testing.data.generators import get_fake_versions_json
@@ -49,7 +54,6 @@ class TestVanillaJarDownloader(T.TestCase):
     """Tests the vanilla jar downloader."""
 
     directory = str(object())
-    server_file = 'minecraft_server.%s.jar'
 
     class FakeFile(object):
         def __init__(self, contents):
@@ -57,6 +61,8 @@ class TestVanillaJarDownloader(T.TestCase):
 
         def read(self):
             return self.contents
+
+        write = mock.Mock(spec=lambda self, s: None)
 
         def __enter__(self): return self
         def __exit__(self, *args): pass
@@ -78,6 +84,12 @@ class TestVanillaJarDownloader(T.TestCase):
         ):
             yield
 
+    def test_jar_filename_regexes(self):
+        version = str(object())
+        filename = JAR_FILENAME % version
+        T.assert_equal(VERSION_REGEX.match(filename).groups()[0], version)
+        T.assert_equal(True, fnmatch.fnmatch(filename, JAR_MATCH))
+
     def test_latest_filename(self):
         T.assert_equal(
             VanillaJarDownloader(self.directory)._latest_filename,
@@ -86,7 +98,7 @@ class TestVanillaJarDownloader(T.TestCase):
 
     def test_to_jar(self):
         version = str(object())
-        filename = self.server_file % version
+        filename = JAR_FILENAME % version
         jar_out = VanillaJarDownloader._to_jar(filename)
 
         T.assert_isinstance(jar_out, Jar)
@@ -101,18 +113,18 @@ class TestVanillaJarDownloader(T.TestCase):
                 'foo.jar',
                 'foo',
                 # Some actual files that we downloaded
-                self.server_file % 'herp',
-                self.server_file % 'derp',
-                self.server_file % '1.6.2',
+                JAR_FILENAME % 'herp',
+                JAR_FILENAME % 'derp',
+                JAR_FILENAME % '1.6.2',
             ]
             instance = VanillaJarDownloader(self.directory)
             downloaded_versions = instance.downloaded_versions
             T.assert_equal(
                 downloaded_versions,
                 [
-                    Jar(self.server_file % 'herp', 'herp'),
-                    Jar(self.server_file % 'derp', 'derp'),
-                    Jar(self.server_file % '1.6.2', '1.6.2'),
+                    Jar(JAR_FILENAME % 'herp', 'herp'),
+                    Jar(JAR_FILENAME % 'derp', 'derp'),
+                    Jar(JAR_FILENAME % '1.6.2', '1.6.2'),
                 ]
             )
 
@@ -172,10 +184,10 @@ class TestVanillaJarDownloader(T.TestCase):
             '_try_to_get_latest_version',
             autospec=True,
         ) as _try_to_get_latest_mock:
-            _try_to_get_latest_mock.return_value = self.server_file % 'herp'
+            _try_to_get_latest_mock.return_value = JAR_FILENAME % 'herp'
             instance = VanillaJarDownloader(self.directory)
             return_value = instance.latest_downloaded_version
-            T.assert_equal(return_value, Jar(self.server_file % 'herp', 'herp'))
+            T.assert_equal(return_value, Jar(JAR_FILENAME % 'herp', 'herp'))
 
     def test_latest_download_version_trys_to_clean_up_on_failure(self):
         with contextlib.nested(
@@ -219,3 +231,43 @@ class TestVanillaJarDownloader(T.TestCase):
                 ])
             )
 
+    def test_download_specific_version_version_does_not_exist(self):
+        with contextlib.nested(
+            mock.patch.object(
+                VanillaJarDownloader,
+                'available_versions',
+                ['foo'],
+            ),
+            T.assert_raises(AssertionError),
+        ):
+            instance = VanillaJarDownloader(self.directory)
+            instance.download_specific_version('version_dne')
+
+    def test_download_specific_version_performs_download(self):
+        version = str(object())
+        with contextlib.nested(
+            mock.patch.object(urllib2, 'urlopen', autospec=True),
+            mock.patch.object(__builtin__, 'open', autospec=True),
+            mock.patch.object(
+                VanillaJarDownloader,
+                'available_versions',
+                [version,],
+            ),
+        ) as (
+            urlopen_mock,
+            open_mock,
+            _,
+        ):
+            open_mock.return_value = self.FakeFile(None)
+            instance = VanillaJarDownloader(self.directory)
+            instance.download_specific_version(version)
+            urlopen_mock.assert_called_once_with(
+                DOWNLOAD_PATH.format(version=version)
+            )
+            open_mock.assert_called_once_with(
+                os.path.join(self.directory, JAR_FILENAME % version),
+                'wb',
+            )
+            open_mock.return_value.write.assert_called_once_with(
+                urlopen_mock.return_value.read.return_value
+            )

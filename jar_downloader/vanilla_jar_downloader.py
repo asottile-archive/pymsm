@@ -15,6 +15,7 @@ DOWNLOAD_PATH = 'https://s3.amazonaws.com/Minecraft.Download/versions/{version}/
 
 VERSION_REGEX = re.compile('minecraft_server.(.+).jar')
 JAR_MATCH = 'minecraft_server.*.jar'
+JAR_FILENAME = 'minecraft_server.%s.jar'
 
 LATEST_FILE = 'latest.txt'
 
@@ -105,3 +106,23 @@ class VanillaJarDownloader(JarDownloaderBase):
         return natural_sort([
             version_dict['id'] for version_dict in json_object['versions']
         ])
+
+    def download_specific_version(self, version):
+        """Downloads a specific version of minecraft_server.jar
+
+        Note: this function is probably slow because it downloads a jar
+        """
+        # TODO: maybe log a warning here if the file already exists
+        # but for now just overwrite it if it exists.
+        # This is probably a good approach as this method could be used for
+        # "fixing" corrupted files if such a thing were to happen
+        if not version in self.available_versions:
+            raise AssertionError('Not a valid version number.')
+
+        jar_filename = os.path.join(self.jar_directory, JAR_FILENAME % version)
+        with open(jar_filename, 'wb') as jar_file:
+            jar_file.write(
+                urllib2.urlopen(
+                    DOWNLOAD_PATH.format(version=version)
+                ).read()
+            )
