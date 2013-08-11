@@ -17,6 +17,7 @@ from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
 from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
 from testing.assertions.version_json import assert_json_structure
 from testing.data.generators import get_fake_versions_json
+from util.natural_sort import natural_sort
 
 class TestGetVersionsJson(T.TestCase):
     """Tests the get_versions_json method."""
@@ -212,8 +213,9 @@ class TestVanillaJarDownloader(T.TestCase):
 
             T.assert_equal(
                 versions,
-                [
+                natural_sort([
                     version_dict['id']
                     for version_dict in get_versions_json_mock.return_value['versions']
-                ]
+                ])
             )
+

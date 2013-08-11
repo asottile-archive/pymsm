@@ -8,6 +8,7 @@ import urllib2
 
 from jar_downloader.jar_downloader_base import Jar
 from jar_downloader.jar_downloader_base import JarDownloaderBase
+from util.natural_sort import natural_sort
 
 VERSIONS_ENDPOINT = 'https://s3.amazonaws.com/Minecraft.Download/versions/versions.json'
 DOWNLOAD_PATH = 'https://s3.amazonaws.com/Minecraft.Download/versions/{version}/minecraft_server.{version}.jar'
@@ -101,6 +102,6 @@ class VanillaJarDownloader(JarDownloaderBase):
         """
         json_object = get_versions_json()
 
-        return [
+        return natural_sort([
             version_dict['id'] for version_dict in json_object['versions']
-        ]
+        ])
