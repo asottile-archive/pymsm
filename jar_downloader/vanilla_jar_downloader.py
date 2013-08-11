@@ -101,10 +101,10 @@ class VanillaJarDownloader(JarDownloaderBase):
         Note: this is potentially expensive and flaky because it hits an
         external endpoint.
         """
-        json_object = get_versions_json()
+        versions_json = get_versions_json()
 
         return natural_sort([
-            version_dict['id'] for version_dict in json_object['versions']
+            version_dict['id'] for version_dict in versions_json['versions']
         ])
 
     def download_specific_version(self, version):
@@ -126,3 +126,26 @@ class VanillaJarDownloader(JarDownloaderBase):
                     DOWNLOAD_PATH.format(version=version)
                 ).read()
             )
+
+    def update(self):
+        """Downloads the latest version if we haven't already downloaded it."""
+        versions_json = get_versions_json()
+        latest_version = versions_json['latest']['release']
+
+        # Try and see what the current downloaded version is
+        # This may fail, this is ok
+        current_latest_version = None
+        try:
+           current_latest_version = self.latest_downloaded_version
+        except InvalidVersionFileError: pass
+
+        # If the latest version is in fact new download it and write to our
+        # version file
+        # Return the new version number to indicate it was updated
+        if latest_version != current_latest_version:
+            self.download_specific_version(latest_version)
+            latest_jar_filename = JAR_FILENAME % latest_version
+            with open(self._latest_filename, 'w') as latest_file:
+                latest_file.write(latest_jar_filename)
+            return self._to_jar(latest_jar_filename)
+

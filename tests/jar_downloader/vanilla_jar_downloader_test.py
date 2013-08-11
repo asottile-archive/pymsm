@@ -58,11 +58,10 @@ class TestVanillaJarDownloader(T.TestCase):
     class FakeFile(object):
         def __init__(self, contents):
             self.contents = contents
+            self.write = mock.Mock(spec=lambda self, s: None)
 
         def read(self):
             return self.contents
-
-        write = mock.Mock(spec=lambda self, s: None)
 
         def __enter__(self): return self
         def __exit__(self, *args): pass
@@ -271,3 +270,70 @@ class TestVanillaJarDownloader(T.TestCase):
             open_mock.return_value.write.assert_called_once_with(
                 urlopen_mock.return_value.read.return_value
             )
+
+    def test_update_with_no_new_jar(self):
+        version = str(object())
+        with contextlib.nested(
+            mock.patch.object(
+                jar_downloader.vanilla_jar_downloader,
+                'get_versions_json',
+                autospec=True,
+            ),
+            mock.patch.object(
+                VanillaJarDownloader,
+                'latest_downloaded_version',
+                version,
+            ),
+        ) as (
+            get_versions_json_mock,
+            _,
+        ):
+            get_versions_json_mock.return_value = get_fake_versions_json(
+                release_version=version,
+            )
+            instance = VanillaJarDownloader(self.directory)
+            return_value = instance.update()
+            T.assert_is(return_value, None)
+
+    def test_update_with_new_jar(self):
+        version = str(object())
+        with contextlib.nested(
+            mock.patch.object(
+                jar_downloader.vanilla_jar_downloader,
+                'get_versions_json',
+                autospec=True,
+            ),
+            mock.patch.object(
+                VanillaJarDownloader,
+                'download_specific_version',
+                autospec=True,
+            ),
+            mock.patch.object(__builtin__, 'open', autospec=True),
+            mock.patch.object(
+                VanillaJarDownloader,
+                'latest_downloaded_version',
+                None,
+            ),
+        ) as (
+            get_versions_json_mock,
+            download_specific_version_mock,
+            open_mock,
+            _,
+        ):
+            get_versions_json_mock.return_value = get_fake_versions_json(
+                release_version=version,
+            )
+            open_mock.return_value = self.FakeFile(None)
+
+            instance = VanillaJarDownloader(self.directory)
+            retval = instance.update()
+
+            get_versions_json_mock.assert_called_once_with()
+            download_specific_version_mock.assert_called_once_with(
+                instance, version,
+            )
+            open_mock.assert_called_once_with(instance._latest_filename, 'w')
+            open_mock.return_value.write.assert_called_once_with(
+                JAR_FILENAME % version
+            )
+            T.assert_equal(retval, Jar(JAR_FILENAME % version, version))

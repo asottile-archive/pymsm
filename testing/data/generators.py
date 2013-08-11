@@ -19,9 +19,13 @@ def get_fake_versions_json(
 
     if release_version is NO_ARG:
         release_version = versions[0]
+    else:
+       versions += release_version
 
     if snapshot_version is NO_ARG:
         snapshot_version = versions[1]
+    else:
+        versions += snapshot_version
 
     assert versions
     assert release_version in versions

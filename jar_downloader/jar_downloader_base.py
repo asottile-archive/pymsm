@@ -54,7 +54,8 @@ class JarDownloaderBase(object):
         raise NotImplementedError
 
     def update(self):
-        """Retrieves the latest jar version and returns a Jar object of it.
+        """Retrieves the latest jar version and returns a Jar object of it only
+        if it was a new jar, otherwise this function returns nothing.
 
         Note: this may not actually download any new jars.
         """
