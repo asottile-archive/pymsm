@@ -56,7 +56,7 @@ class VanillaJarDownloader(JarDownloaderBase):
             if fnmatch.fnmatch(filename, JAR_MATCH)
         ]
 
-    def _try_to_get_latest_version_file(self):
+    def _try_to_get_latest_version(self):
         """Attempts to get the latest version from the LATEST_FILE.
 
         On failure raises InvalidVersionFileError.
@@ -76,7 +76,7 @@ class VanillaJarDownloader(JarDownloaderBase):
     def latest_downloaded_version(self):
         """Returns the latest version that is downloaded."""
         try:
-            latest_jarfile = self._try_to_get_latest_version_file()
+            latest_jarfile = self._try_to_get_latest_version()
         except InvalidVersionFileError:
             # If we didn't get a valid version at least clean up the version
             # file
@@ -85,4 +85,4 @@ class VanillaJarDownloader(JarDownloaderBase):
 
             raise
 
-        return self._to_har(latest_jarfile)
+        return self._to_jar(latest_jarfile)
