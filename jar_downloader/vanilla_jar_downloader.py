@@ -22,8 +22,13 @@ class InvalidVersionFileError(ValueError): pass
 
 
 def get_versions_json():
-    """Returns the versions json for vanilla minecraft."""
+    """Returns the versions json for vanilla minecraft.
+
+    Note: this is potentially slow and/or flaky because it hits an external
+    endpoint
+    """
     return simplejson.loads(
+        # TODO: add a reasonable timeout here
         urllib2.urlopen(VERSIONS_ENDPOINT).read()
     )
 
@@ -86,3 +91,16 @@ class VanillaJarDownloader(JarDownloaderBase):
             raise
 
         return self._to_jar(latest_jarfile)
+
+    @property
+    def available_versions(self):
+        """Returns a list of all available downloadable versions.
+
+        Note: this is potentially expensive and flaky because it hits an
+        external endpoint.
+        """
+        json_object = get_versions_json()
+
+        return [
+            version_dict['id'] for version_dict in json_object['versions']
+        ]

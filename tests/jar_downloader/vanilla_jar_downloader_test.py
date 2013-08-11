@@ -15,6 +15,8 @@ from jar_downloader.vanilla_jar_downloader import InvalidVersionFileError
 from jar_downloader.vanilla_jar_downloader import LATEST_FILE
 from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
 from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
+from testing.assertions.version_json import assert_json_structure
+from testing.data.generators import get_fake_versions_json
 
 class TestGetVersionsJson(T.TestCase):
     """Tests the get_versions_json method."""
@@ -39,30 +41,8 @@ class TestGetVersionsJson(T.TestCase):
     def test_structure_of_external_json(self):
         """A smoke test of the json data returned from the version service."""
         json_object = get_versions_json()
+        assert_json_structure(json_object)
 
-        T.assert_equal(
-            json_object,
-            {
-                'versions': mock.ANY, # Tested more explicitly below
-                'latest': {
-                    'release': mock.ANY,
-                    'snapshot': mock.ANY,
-                }
-            }
-        )
-
-        # Versions should be a list of dict objects
-        T.assert_isinstance(json_object['versions'], list)
-        for version_dict in json_object['versions']:
-            T.assert_equal(
-                version_dict,
-                {
-                    'releaseTime': mock.ANY,
-                    'type': mock.ANY,
-                    'id': mock.ANY,
-                    'time': mock.ANY,
-                }
-            )
 
 class TestVanillaJarDownloader(T.TestCase):
     """Tests the vanilla jar downloader."""
@@ -220,3 +200,20 @@ class TestVanillaJarDownloader(T.TestCase):
             exists_mock.assert_called_once_with(instance._latest_filename)
             remove_mock.assert_called_once_with(instance._latest_filename)
 
+    def test_available_versions(self):
+        with mock.patch.object(
+            jar_downloader.vanilla_jar_downloader,
+            'get_versions_json',
+            autospec=True,
+        ) as get_versions_json_mock:
+            get_versions_json_mock.return_value = get_fake_versions_json()
+            instance = VanillaJarDownloader(self.directory)
+            versions = instance.available_versions
+
+            T.assert_equal(
+                versions,
+                [
+                    version_dict['id']
+                    for version_dict in get_versions_json_mock.return_value['versions']
+                ]
+            )
