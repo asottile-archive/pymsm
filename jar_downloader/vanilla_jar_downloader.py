@@ -52,6 +52,19 @@ class VanillaJarDownloader(JarDownloaderBase):
             VERSION_REGEX.match(filename).groups()[0],
         )
 
+    @classmethod
+    def get_config_schema(cls):
+        """The config schema for vanilla jar downloader is whether or not they
+        are on the release channel.
+        """
+        return {
+            'type': 'object',
+            'properties': {
+                'is_release': {'type': 'boolean'},
+            },
+            'required': ['is_release',],
+        }
+
     @property
     def downloaded_versions(self):
         """Lists all of the files in the directory and returns Jar objects of
