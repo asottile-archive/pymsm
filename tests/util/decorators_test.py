@@ -1,22 +1,18 @@
 
-import collections
 import contextlib
 import flask
 import mock
 import testify as T
 import werkzeug.exceptions
 
+from util.auto_namedtuple import auto_namedtuple
 from util.decorators import require_internal
 
 class TestRequireInternal(T.TestCase):
     """Tests the @require_internal decorator."""
 
     def _get_fake_request(self, remote_addr='127.0.0.1'):
-        return (
-            collections.namedtuple(
-                'MockRequest', ['remote_addr'],
-            )(remote_addr)
-        )
+        return auto_namedtuple('MockRequest', remote_addr=remote_addr)
 
     def _get_callable_mock(self):
         mock_callable = mock.Mock()
