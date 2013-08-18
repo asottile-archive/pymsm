@@ -60,9 +60,12 @@ class VanillaJarDownloader(JarDownloaderBase):
         return {
             'type': 'object',
             'properties': {
-                'is_release': {'type': 'boolean'},
+                'jar_type': {
+                    'title': 'Jar Type',
+                    'enum': ['release', 'snapshot'],
+                },
             },
-            'required': ['is_release',],
+            'required': ['jar_type',],
         }
 
     @property
