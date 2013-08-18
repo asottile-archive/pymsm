@@ -46,6 +46,11 @@ TESTS = [
         "Py    - Tests",
         False, 'testtests',
     ),
+    Test(
+        "./check.sh",
+        "All   - check.sh",
+        False, 'testcheck',
+    ),
 ]
 
 def get_git_config(config_name):
