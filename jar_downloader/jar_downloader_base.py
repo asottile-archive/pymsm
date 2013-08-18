@@ -1,6 +1,10 @@
 
 import collections
+import jsonschema
 import os.path
+import simplejson
+
+CONFIG_FILE = 'config.json'
 
 class Jar(collections.namedtuple('Jar', ['filename', 'short_version'])):
     """A Jar represents a single file of a jar inside the jar_directory.
@@ -27,6 +31,28 @@ class JarDownloaderBase(object):
         """
         assert os.path.exists(jar_directory)
         self.jar_directory = jar_directory
+
+    @classmethod
+    def get_config_schema(cls):
+        """Implement to define configuration schema.  This should be usable
+        with jsonschema to validate the configuration file.
+        """
+        return {
+            'type': 'object',
+        }
+
+    @property
+    def config_file(self):
+        return os.path.join(self.jar_directory, CONFIG_FILE)
+
+    @property
+    def config(self):
+        # TODO: catch all the exceptions here and raise one specific type
+        with open(self.config_file, 'r') as config_file:
+            config_data = simplejson.load(config_file.read())
+
+        jsonschema.validate(config_data, self.get_config_schema())
+        return config_data
 
     @property
     def downloaded_versions(self):

@@ -55,10 +55,11 @@ check_prog pip
 check_python_module ipdb
 check_python_module testify
 check_python_module coverage
-check_python_module json
+check_python_module simplejson
 check_python_module flask
 check_python_module testify
 check_python_module mock
+check_python_module jsonschema
 
 exit $exit_ret
 
