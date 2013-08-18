@@ -60,6 +60,7 @@ check_python_module flask
 check_python_module testify
 check_python_module mock
 check_python_module jsonschema
+check_python_module pyquery
 
 exit $exit_ret
 
