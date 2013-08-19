@@ -24,5 +24,5 @@ class BaseProperty(object):
             parts.insert(0, self.dotted_path_to_property)
         return '.'.join(parts)
 
-    def __html__(self):
+    def __pq__(self):
         raise NotImplementedError
