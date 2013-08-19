@@ -293,6 +293,26 @@ class TestVanillaJarDownloader(T.TestCase):
                 urlopen_mock.return_value.read.return_value
             )
 
+    def test_get_latest_version(self):
+        release_version = '1.6.2'
+        snapshot_version = '19w32a'
+        self.get_versions_json_mock.return_value = get_fake_versions_json(
+            release_version=release_version,
+            snapshot_version=snapshot_version,
+        )
+
+        instance = VanillaJarDownloader(self.directory)
+
+        with mock.patch.dict(
+            VanillaJarDownloader.config, {'jar_type': RELEASE}
+        ):
+            T.assert_is(instance._get_latest_version(), release_version)
+
+        with mock.patch.dict(
+            VanillaJarDownloader.config, {'jar_type': SNAPSHOT}
+        ):
+            T.assert_is(instance._get_latest_version(), snapshot_version)
+
     def test_update_with_no_new_jar(self):
         version = str(object())
         with mock.patch.object(

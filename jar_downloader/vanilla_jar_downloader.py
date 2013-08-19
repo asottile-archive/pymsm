@@ -154,10 +154,13 @@ class VanillaJarDownloader(JarDownloaderBase):
                 ).read()
             )
 
+    def _get_latest_version(self):
+        versions_json = get_versions_json()
+        return versions_json['latest'][self.config['jar_type']]
+
     def update(self):
         """Downloads the latest version if we haven't already downloaded it."""
-        versions_json = get_versions_json()
-        latest_version = versions_json['latest']['release']
+        latest_version = self._get_latest_version()
 
         # Try and see what the current downloaded version is
         # This may fail, this is ok
