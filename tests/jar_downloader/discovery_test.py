@@ -1,6 +1,7 @@
 
 import testify as T
 
+from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_module_name
 from jar_downloader.discovery import is_jar_downloader
 from jar_downloader.jar_downloader_base import JarDownloaderBase
@@ -42,3 +43,8 @@ class TestIsJarDownloader(T.TestCase):
     def test_some_object_that_should_be_a_jar_downloader(self):
         class ImAJarDownloader(JarDownloaderBase): pass
         T.assert_equal(is_jar_downloader(ImAJarDownloader), True)
+
+class TestGetJarDownloaders(T.TestCase):
+    # XXX: this method is pretty nuts so this is more of a smoke test
+    def test_get_jar_downloaders(self):
+        assert get_jar_downloaders()
