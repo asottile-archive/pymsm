@@ -63,6 +63,8 @@ class VanillaJarDownloader(JarDownloaderBase):
                 'jar_type': {
                     'title': 'Jar Type',
                     'enum': ['release', 'snapshot'],
+                    'labels': ['Release', 'Snapshot'],
+                    'default': 'release',
                 },
             },
             'required': ['jar_type',],
