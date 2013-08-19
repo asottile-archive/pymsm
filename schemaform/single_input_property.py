@@ -2,6 +2,8 @@
 from schemaform.base_property import BaseProperty
 from schemaform.helpers import el
 
+EXPECTED_PROPERTY_TYPES = ['integer', 'number', 'string']
+
 class SingleInputProperty(BaseProperty):
     """A SingleInputProperty represents a property that represents a single
     input such as a string or number.
@@ -22,6 +24,9 @@ class SingleInputProperty(BaseProperty):
             property_name,
             property_dict,
         )
+
+        if property_dict.get('type', 'string') not in EXPECTED_PROPERTY_TYPES:
+            raise ValueError('Unexpected type for single input property.')
 
     def __pq__(self):
         """Returns the pyquery object representing this object."""
