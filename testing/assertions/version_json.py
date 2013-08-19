@@ -1,14 +1,17 @@
 import mock
 import testify as T
 
+from jar_downloader.vanilla_jar_downloader import RELEASE
+from jar_downloader.vanilla_jar_downloader import SNAPSHOT
+
 def assert_json_structure(json_object):
     T.assert_equal(
         json_object,
         {
             'versions': mock.ANY, # Tested more explicitly below
             'latest': {
-                'release': mock.ANY,
-                'snapshot': mock.ANY,
+                RELEASE: mock.ANY,
+                SNAPSHOT: mock.ANY,
             }
         }
     )

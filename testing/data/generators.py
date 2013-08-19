@@ -55,7 +55,7 @@ def get_fake_versions_json(
             for version, release_type in versions_to_types.iteritems()
         ],
         'latest': {
-            'release': release_version,
-             'snapshot': snapshot_version,
+            RELEASE: release_version,
+            SNAPSHOT: snapshot_version,
         }
     }
