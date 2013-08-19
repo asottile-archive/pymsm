@@ -19,6 +19,9 @@ JAR_FILENAME = 'minecraft_server.%s.jar'
 
 LATEST_FILE = 'latest.txt'
 
+RELEASE = 'release'
+SNAPSHOT = 'snapshot'
+
 
 class InvalidVersionFileError(ValueError): pass
 
@@ -62,9 +65,9 @@ class VanillaJarDownloader(JarDownloaderBase):
             'properties': {
                 'jar_type': {
                     'title': 'Jar Type',
-                    'enum': ['release', 'snapshot'],
-                    'labels': ['Release', 'Snapshot'],
-                    'default': 'release',
+                    'enum': [RELEASE, SNAPSHOT],
+                    'labels': [RELEASE.title(), SNAPSHOT.title()],
+                    'default': RELEASE,
                 },
             },
             'required': ['jar_type',],
@@ -121,8 +124,14 @@ class VanillaJarDownloader(JarDownloaderBase):
         """
         versions_json = get_versions_json()
 
+        version_dict_filter_types = set([RELEASE])
+        if self.config['jar_type'] == SNAPSHOT:
+            version_dict_filter_types.add(SNAPSHOT)
+
         return natural_sort([
-            version_dict['id'] for version_dict in versions_json['versions']
+            version_dict['id']
+            for version_dict in versions_json['versions']
+            if version_dict['type'] in version_dict_filter_types
         ])
 
     def download_specific_version(self, version):

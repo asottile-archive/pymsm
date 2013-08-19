@@ -17,6 +17,8 @@ from jar_downloader.vanilla_jar_downloader import InvalidVersionFileError
 from jar_downloader.vanilla_jar_downloader import JAR_FILENAME
 from jar_downloader.vanilla_jar_downloader import JAR_MATCH
 from jar_downloader.vanilla_jar_downloader import LATEST_FILE
+from jar_downloader.vanilla_jar_downloader import RELEASE
+from jar_downloader.vanilla_jar_downloader import SNAPSHOT
 from jar_downloader.vanilla_jar_downloader import VanillaJarDownloader
 from jar_downloader.vanilla_jar_downloader import VERSION_REGEX
 from jar_downloader.vanilla_jar_downloader import VERSIONS_ENDPOINT
@@ -71,6 +73,25 @@ class TestVanillaJarDownloader(T.TestCase):
             '__init__',
             fake_init,
         ):
+            yield
+
+    @T.setup_teardown
+    def patch_out_config(self):
+        """Patch out VanillaJarDownloader.config"""
+        with mock.patch.object(
+            VanillaJarDownloader,
+            'config',
+            {'jar_type': RELEASE},
+        ):
+            yield
+
+    @T.setup_teardown
+    def patch_out_get_versions_json(self):
+        with mock.patch.object(
+            jar_downloader.vanilla_jar_downloader,
+            'get_versions_json',
+            autospec=True,
+        ) as self.get_versions_json_mock:
             yield
 
     def test_jar_filename_regexes(self):
@@ -202,13 +223,23 @@ class TestVanillaJarDownloader(T.TestCase):
             exists_mock.assert_called_once_with(instance._latest_filename)
             remove_mock.assert_called_once_with(instance._latest_filename)
 
-    def test_available_versions(self):
-        with mock.patch.object(
-            jar_downloader.vanilla_jar_downloader,
-            'get_versions_json',
-            autospec=True,
-        ) as get_versions_json_mock:
-            get_versions_json_mock.return_value = get_fake_versions_json()
+    def test_available_versions_release(self):
+        self.get_versions_json_mock.return_value = get_fake_versions_json()
+        instance = VanillaJarDownloader(self.directory)
+        versions = instance.available_versions
+
+        T.assert_equal(
+            versions,
+            natural_sort([
+                version_dict['id']
+                for version_dict in self.get_versions_json_mock.return_value['versions']
+                if version_dict['type'] == RELEASE
+            ])
+        )
+
+    def test_available_versions_snapshot(self):
+        with mock.patch.dict(VanillaJarDownloader.config, {'jar_type': SNAPSHOT}):
+            self.get_versions_json_mock.return_value = get_fake_versions_json()
             instance = VanillaJarDownloader(self.directory)
             versions = instance.available_versions
 
@@ -216,7 +247,8 @@ class TestVanillaJarDownloader(T.TestCase):
                 versions,
                 natural_sort([
                     version_dict['id']
-                    for version_dict in get_versions_json_mock.return_value['versions']
+                    for version_dict in self.get_versions_json_mock.return_value['versions']
+                    if version_dict['type'] in  set([RELEASE, SNAPSHOT])
                 ])
             )
 
@@ -263,22 +295,12 @@ class TestVanillaJarDownloader(T.TestCase):
 
     def test_update_with_no_new_jar(self):
         version = str(object())
-        with contextlib.nested(
-            mock.patch.object(
-                jar_downloader.vanilla_jar_downloader,
-                'get_versions_json',
-                autospec=True,
-            ),
-            mock.patch.object(
-                VanillaJarDownloader,
-                'latest_downloaded_version',
-                version,
-            ),
-        ) as (
-            get_versions_json_mock,
-            _,
+        with mock.patch.object(
+            VanillaJarDownloader,
+            'latest_downloaded_version',
+            version,
         ):
-            get_versions_json_mock.return_value = get_fake_versions_json(
+            self.get_versions_json_mock.return_value = get_fake_versions_json(
                 release_version=version,
             )
             instance = VanillaJarDownloader(self.directory)
@@ -288,11 +310,6 @@ class TestVanillaJarDownloader(T.TestCase):
     def test_update_with_new_jar(self):
         version = str(object())
         with contextlib.nested(
-            mock.patch.object(
-                jar_downloader.vanilla_jar_downloader,
-                'get_versions_json',
-                autospec=True,
-            ),
             mock.patch.object(
                 VanillaJarDownloader,
                 'download_specific_version',
@@ -305,12 +322,11 @@ class TestVanillaJarDownloader(T.TestCase):
                 None,
             ),
         ) as (
-            get_versions_json_mock,
             download_specific_version_mock,
             open_mock,
             _,
         ):
-            get_versions_json_mock.return_value = get_fake_versions_json(
+            self.get_versions_json_mock.return_value = get_fake_versions_json(
                 release_version=version,
             )
             open_mock.return_value = FakeFile()
@@ -318,7 +334,7 @@ class TestVanillaJarDownloader(T.TestCase):
             instance = VanillaJarDownloader(self.directory)
             retval = instance.update()
 
-            get_versions_json_mock.assert_called_once_with()
+            self.get_versions_json_mock.assert_called_once_with()
             download_specific_version_mock.assert_called_once_with(
                 instance, version,
             )
