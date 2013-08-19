@@ -1,5 +1,7 @@
 
+from schemaform.boolean_property import BooleanProperty
 from schemaform.helpers import validate_schema_against_draft4
+from schemaform.single_input_property import SingleInputProperty
 
 class Form(object):
     """The main object of the schemaform package.  A Form encapsulates how a
@@ -16,3 +18,15 @@ class Form(object):
         validate_schema_against_draft4(schema)
         self.schema = schema
         self.form_attrs = form_attrs
+
+    @classmethod
+    def get_property_type_cls_map(cls):
+        """Override if you want to change the behavior."""
+        return {
+            'boolean': BooleanProperty,
+            'integer': SingleInputProperty,
+            'number': SingleInputProperty,
+            'string': SingleInputProperty,
+            # 'enum': EnumProperty,
+            # 'object': ObjectProperty,
+        }

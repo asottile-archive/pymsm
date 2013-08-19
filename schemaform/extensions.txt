@@ -6,3 +6,7 @@ Boolean, integer, number, and string properties have an optional 'label'
 Enum properties have an optional 'labels' property which is an array of strings
     corresponding to the enum choices.  It must have the same length as the
     choices.  If absent it defaults to the choices title-cased.
+
+Object properties have an optional property 'propertyOrder' which is an array
+    of property names.  If absent, the order is unspecified (and really sucks).
+
