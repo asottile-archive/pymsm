@@ -20,6 +20,10 @@ class TestGetModuleName(T.TestCase):
         module_name = get_module_name('foo/bar', 'baz.py')
         T.assert_equal(module_name, 'foo.bar.baz')
 
+    def test_strips_prefixing_dot_slash(self):
+        module_name = get_module_name('./foo', 'bar.py')
+        T.assert_equal(module_name, 'foo.bar')
+
 class TestIsJarDownloader(T.TestCase):
     """Tests the is_jar_downloader method."""
 

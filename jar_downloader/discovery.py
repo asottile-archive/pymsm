@@ -12,6 +12,10 @@ JAR_DOWNLOADER_DIRECTORY = os.path.dirname(__file__)
 def get_module_name(root, filename):
     if not filename.endswith('.py'):
         raise ValueError('filename must end with .py')
+
+    if root.startswith('./'):
+        root = root[2:]
+
     filename = filename[:-3]
     # XXX: should really use pathsep here
     return os.path.join(root, filename).replace('/', '.')
