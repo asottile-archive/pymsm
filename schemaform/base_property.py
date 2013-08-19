@@ -24,5 +24,8 @@ class BaseProperty(object):
             parts.insert(0, self.dotted_path_to_property)
         return '.'.join(parts)
 
+    def get_label_text(self):
+        return self.property_dict.get('label', self.property_name.title())
+
     def __pq__(self):
         raise NotImplementedError
