@@ -1,4 +1,6 @@
 import collections
+import itertools
+import pyquery
 
 from schemaform.base_property import BaseProperty
 from schemaform.helpers import el
@@ -68,20 +70,26 @@ class RadioEnumProperty(BaseProperty):
                     )
                 )
 
+    def _get_inputs(self):
+        name = self.get_input_name()
+        values = self.property_dict['enum']
+        labels = self.property_dict.get('labels', values)
+        default_value = self.property_dict.get('default', values[0])
+
+        for value, label in itertools.izip(values, labels):
+            yield RadioInput(
+                name,
+                value,
+                label,
+                value == default_value,
+            )
+
     def __pq__(self):
         """Returns the pyquery object representing this object."""
-        label_text = self.property_dict.get('label', self.property_name.title())
-        input_name = self.get_input_name()
-        input_id = 'id_' + input_name
-
-        input_attrs = {
-            'name': input_name,
-            'id': input_id,
-        }
-
-        if self.property_dict.get('default', False):
-            input_attrs['checked'] = 'checked'
-
-        input_element = el('input', **input_attrs)
-        label_element = el('label', text=label_text, **{'for': input_id})
-        return input_element + label_element
+        inputs = [input.__pq__() for input in self._get_inputs()]
+        inputs_as_pyquery = pyquery.PyQuery(list(itertools.chain(*inputs)))
+        label = self.property_dict.get('label', self.get_input_name())
+        legend = el('legend', text=label)
+        radio_contents = legend + inputs_as_pyquery
+        radio_contents.wrap(el('fieldset').__html__())
+        return radio_contents
