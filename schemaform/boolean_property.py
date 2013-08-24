@@ -22,7 +22,7 @@ class BooleanProperty(BaseProperty):
         )
 
         if property_dict['type'] != 'boolean':
-            raise ValueError('Unexpected type for boolean property.')
+            raise ValueError('Unexpected schema for boolean property.')
 
     def __pq__(self):
         """Returns the pyquery object representing this object."""
