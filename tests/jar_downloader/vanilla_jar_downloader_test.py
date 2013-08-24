@@ -363,3 +363,33 @@ class TestVanillaJarDownloader(T.TestCase):
                 JAR_FILENAME % version
             )
             T.assert_equal(retval, Jar(JAR_FILENAME % version, version))
+
+    def test_update_with_corrupted_version_file(self):
+        version = str(object())
+        with contextlib.nested(
+            mock.patch.object(
+                VanillaJarDownloader,
+                'download_specific_version',
+                autospec=True,
+            ),
+            mock.patch.object(__builtin__, 'open', autospec=True),
+            mock.patch.object(
+                VanillaJarDownloader,
+                'latest_downloaded_version',
+                mock.PropertyMock(side_effect=InvalidVersionFileError),
+            ),
+        ) as (
+            download_specific_version_mock,
+            open_mock,
+            _,
+        ):
+            self.get_versions_json_mock.return_value = get_fake_versions_json(
+                release_version=version,
+            )
+            open_mock.return_value = FakeFile()
+
+            instance = VanillaJarDownloader(self.directory)
+            retval = instance.update()
+
+            # Only really care that it updates when its version file is borked
+            T.assert_equal(retval, Jar(JAR_FILENAME % version, version))
