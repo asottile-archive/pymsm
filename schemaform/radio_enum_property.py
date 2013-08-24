@@ -73,13 +73,16 @@ class RadioEnumProperty(BaseProperty):
     def _get_inputs(self):
         name = self.get_input_name()
         values = self.property_dict['enum']
-        labels = self.property_dict.get('labels', values)
+        labels = self.property_dict.get(
+            'labels',
+            [self.normalize_value(value).title() for value in values]
+        )
         default_value = self.property_dict.get('default', values[0])
 
         for value, label in itertools.izip(values, labels):
             yield RadioInput(
                 name,
-                value,
+                self.normalize_value(value),
                 label,
                 value == default_value,
             )
@@ -88,7 +91,7 @@ class RadioEnumProperty(BaseProperty):
         """Returns the pyquery object representing this object."""
         inputs = [input.__pq__() for input in self._get_inputs()]
         inputs_as_pyquery = pyquery.PyQuery(list(itertools.chain(*inputs)))
-        label = self.property_dict.get('label', self.get_input_name())
+        label = self.get_label_text()
         legend = el('legend', text=label)
         radio_contents = legend + inputs_as_pyquery
         radio_contents.wrap(el('fieldset').__html__())

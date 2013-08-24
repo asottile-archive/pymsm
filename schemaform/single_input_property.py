@@ -39,17 +39,12 @@ class SingleInputProperty(BaseProperty):
                 )
             )
 
-    def _get_default_value(self):
-        """Returns the default value for the input element."""
-        default_value = self.property_dict.get('default', '')
-        if not isinstance(default_value, basestring):
-            default_value = unicode(default_value)
-        return default_value
-
     def __pq__(self):
         """Returns the pyquery object representing this object."""
         label_text = self.get_label_text()
-        default_value = self._get_default_value()
+        default_value = self.normalize_value(
+            self.property_dict.get('default', ''),
+        )
         input_name = self.get_input_name()
         input_id = 'id_' + input_name
 

@@ -32,5 +32,15 @@ class BaseProperty(object):
     def get_label_text(self):
         return self.property_dict.get('label', self.property_name.title())
 
+    @classmethod
+    def normalize_value(cls, value):
+        """If a value is not a stringlike, convert it to one."""
+        if isinstance(value, basestring):
+            return value
+        elif value is None:
+            return ''
+        else:
+            return unicode(value)
+
     def __pq__(self):
         raise NotImplementedError
