@@ -47,3 +47,10 @@ class TestSingleInputProperty(T.TestCase):
     def test_raises_on_invalid_property_type(self):
         with T.assert_raises(ValueError):
             self.get_elements({'type': 'boolean'})
+
+    def test_handles_integer_type_default(self):
+        _, input_element = self.get_elements({
+            'type': 'integer',
+            'default': 5,
+        })
+        T.assert_equal(input_element.val(), '5')
