@@ -1,4 +1,6 @@
 
+from schemaform.helpers import validate_default_value
+from schemaform.helpers import validate_enum_values
 
 class BaseProperty(object):
     """Base class for all properties."""
@@ -16,6 +18,9 @@ class BaseProperty(object):
         self.dotted_path_to_property = dotted_path_to_property
         self.property_name = property_name
         self.property_dict = property_dict
+
+        validate_default_value(self.property_dict)
+        validate_enum_values(self.property_dict)
 
     def get_input_name(self):
         """Returns a dotted path that will be used as the <input> name"""
