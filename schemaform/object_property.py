@@ -42,6 +42,9 @@ class ObjectProperty(BaseProperty):
         if get_type_from_schema(self.property_dict) != Types.OBJECT:
             raise ValueError('Unexpected schema for object property.')
 
+        if not self.property_dict.get('properties'):
+            raise ValueError('An object must specify at least one property.')
+
         if 'propertyOrder' in self.property_dict:
             if (
                 len(self.property_dict['propertyOrder']) !=
