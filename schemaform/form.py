@@ -1,6 +1,7 @@
 
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
+from schemaform.helpers import el
 from schemaform.helpers import validate_schema_against_draft4
 from schemaform.object_property import ObjectProperty
 from schemaform.single_input_property import SingleInputProperty
@@ -33,3 +34,13 @@ class Form(object):
             Types.ENUM: RadioEnumProperty,
             Types.OBJECT: ObjectProperty,
         }
+
+    def __pq__(self):
+        """Returns the pyquery representation of this object."""
+        contents = ObjectProperty(
+            '',
+            '',
+            self.schema,
+            self.get_property_type_cls_map()
+        ).__pq__()
+        return contents.wrapAll(el('form', **self.form_attrs).__html__())
