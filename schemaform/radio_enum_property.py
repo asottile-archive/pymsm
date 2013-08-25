@@ -3,7 +3,7 @@ import collections
 import itertools
 
 from schemaform.base_property import BaseProperty
-from schemaform.helpers import combine_pqable_objects
+from schemaform.helpers import combine_pqables
 from schemaform.helpers import el
 from schemaform.helpers import get_type_from_schema
 from schemaform.types import Types
@@ -92,11 +92,9 @@ class RadioEnumProperty(BaseProperty):
 
     def __pq__(self):
         """Returns the pyquery object representing this object."""
-        legend = el('legend', text=self.get_label_text())
-        radio_contents = combine_pqable_objects(
-            legend, self._get_inputs(),
+        contents = combine_pqables(
+            el('legend', text=self.get_label_text()), self._get_inputs(),
             acceptable_iterable_type=RadioInput,
         )
+        return contents.wrapAll(el('fieldset').__html__())
 
-        radio_contents.wrap(el('fieldset').__html__())
-        return radio_contents

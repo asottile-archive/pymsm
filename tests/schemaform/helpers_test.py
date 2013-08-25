@@ -4,7 +4,7 @@ import pyquery
 import jsonschema
 import testify as T
 
-from schemaform.helpers import combine_pqable_objects
+from schemaform.helpers import combine_pqables
 from schemaform.helpers import el
 from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import validate_default_value
@@ -112,8 +112,8 @@ class TestCombinePqableObjects(T.TestCase):
         def __pq__(self):
             return el('div', text=self.baz)
 
-    def test_combine_pqable_objects(self):
-        ret = combine_pqable_objects(
+    def test_combine_pqables(self):
+        ret = combine_pqables(
             pyquery.PyQuery('<div>'),
             [pyquery.PyQuery('<div>'), pyquery.PyQuery('<span>')],
             self.Pqable(),
@@ -128,14 +128,14 @@ class TestCombinePqableObjects(T.TestCase):
         )
 
     def test_combine_pqable_objects_with_acceptable_iterable_type(self):
-        ret = combine_pqable_objects(
+        ret = combine_pqables(
             self.IterablePqable('foo'),
             acceptable_iterable_type=self.IterablePqable
         )
         T.assert_equal(ret.__html__(), '<div>foo</div>')
 
     def test_combine_pqable_objects_with_acceptable_iterable_types(self):
-        ret = combine_pqable_objects(
+        ret = combine_pqables(
             self.IterablePqable('foo'),
             self.IterablePqable2('baz'),
             acceptable_iterable_type=[

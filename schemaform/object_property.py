@@ -1,5 +1,6 @@
 
 from schemaform.base_property import BaseProperty
+from schemaform.helpers import combine_pqables
 from schemaform.helpers import el
 from schemaform.helpers import get_type_from_schema
 from schemaform.types import Types
@@ -62,20 +63,22 @@ class ObjectProperty(BaseProperty):
             properties.keys(),
         )
 
+        base_path = [self.get_input_name()]
+        for property_name in property_order:
+            property = properties[property_name]
+            property_type = get_type_from_schema(property)
+            args = base_path + [property_name, property]
+
+            # Objects are a special snowflake and need this map
+            if property_type == Types.OBJECT:
+                args += [self.property_type_cls_map]
+
+            yield self.property_type_cls_map[property_type](*args)
+
     def __pq__(self):
         """Returns the pyquery object representing this object."""
-        label_text = self.property_dict.get('label', self.property_name.title())
-        input_name = self.get_input_name()
-        input_id = 'id_' + input_name
-
-        input_attrs = {
-            'name': input_name,
-            'id': input_id,
-        }
-
-        if self.property_dict.get('default', False):
-            input_attrs['checked'] = 'checked'
-
-        input_element = el('input', **input_attrs)
-        label_element = el('label', text=label_text, **{'for': input_id})
-        return input_element + label_element
+        contents = combine_pqables(
+            el('legend', text=self.get_label_text()),
+            self._get_properties()
+        )
+        return contents.wrapAll(el('fieldset').__html__())

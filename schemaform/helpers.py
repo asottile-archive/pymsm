@@ -54,7 +54,7 @@ def get_type_from_schema(schema):
 
     return schema.get('type', Types.STRING)
 
-def combine_pqable_objects(*args, **kwargs):
+def combine_pqables(*args, **kwargs):
     """Combines pyquery object or objects which implement __pq__ into a single
     pyquery object.
 
