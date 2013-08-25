@@ -5,6 +5,7 @@ import os
 import os.path
 import sys
 
+import config.application
 from jar_downloader.jar_downloader_base import JarDownloaderBase
 
 JAR_DOWNLOADER_DIRECTORY = os.path.dirname(__file__)
@@ -17,8 +18,10 @@ def get_module_name(root, filename):
         root = root[2:]
 
     filename = filename[:-3]
+    joined_path = os.path.join(root, filename)
+    relpath = os.path.relpath(joined_path, config.application.APP_ROOT)
     # XXX: should really use pathsep here
-    return os.path.join(root, filename).replace('/', '.')
+    return relpath.replace('/', '.')
 
 def is_jar_downloader(cls):
     return (
