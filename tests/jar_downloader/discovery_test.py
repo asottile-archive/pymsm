@@ -44,6 +44,14 @@ class TestIsJarDownloader(T.TestCase):
         class ImAJarDownloader(JarDownloaderBase): pass
         T.assert_equal(is_jar_downloader(ImAJarDownloader), True)
 
+    def test_child_of_excluded_is_one(self):
+        class ImNotAJarDownloader(JarDownloaderBase):
+            __jar_downloader__ = False
+
+        class ButIAm(ImNotAJarDownloader): pass
+
+        T.assert_equal(is_jar_downloader(ButIAm), True)
+
 class TestGetJarDownloaders(T.TestCase):
     # XXX: this method is pretty nuts so this is more of a smoke test
     def test_get_jar_downloaders(self):

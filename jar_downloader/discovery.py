@@ -27,7 +27,7 @@ def is_jar_downloader(cls):
     return (
         cls is not JarDownloaderBase and
         issubclass(cls, JarDownloaderBase) and
-        getattr(cls, '__jar_downloader__', True)
+        cls.__dict__.get('__jar_downloader__', True)
     )
 
 def get_jar_downloaders():
