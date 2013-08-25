@@ -1,5 +1,6 @@
 
 from schemaform.boolean_property import BooleanProperty
+from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import validate_schema_against_draft4
 from schemaform.single_input_property import SingleInputProperty
 
@@ -27,6 +28,6 @@ class Form(object):
             'integer': SingleInputProperty,
             'number': SingleInputProperty,
             'string': SingleInputProperty,
-            # 'enum': EnumProperty,
+            'enum': RadioEnumProperty,
             # 'object': ObjectProperty,
         }
