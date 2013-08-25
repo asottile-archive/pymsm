@@ -7,7 +7,7 @@ from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.radio_enum_property import RadioInput
 from util.auto_namedtuple import auto_namedtuple
 
-class TestBooleanProperty(T.TestCase):
+class TestRadioEnumProperty(T.TestCase):
 
     path = 'herp.derp'
     property_name = 'harp'

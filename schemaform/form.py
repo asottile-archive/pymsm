@@ -2,7 +2,9 @@
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import validate_schema_against_draft4
+from schemaform.object_property import ObjectProperty
 from schemaform.single_input_property import SingleInputProperty
+from schemaform.types import Types
 
 class Form(object):
     """The main object of the schemaform package.  A Form encapsulates how a
@@ -24,10 +26,10 @@ class Form(object):
     def get_property_type_cls_map(cls):
         """Override if you want to change the behavior."""
         return {
-            'boolean': BooleanProperty,
-            'integer': SingleInputProperty,
-            'number': SingleInputProperty,
-            'string': SingleInputProperty,
-            'enum': RadioEnumProperty,
-            # 'object': ObjectProperty,
+            Types.BOOLEAN: BooleanProperty,
+            Types.INTEGER: SingleInputProperty,
+            Types.NUMBER: SingleInputProperty,
+            Types.STRING: SingleInputProperty,
+            Types.ENUM: RadioEnumProperty,
+            Types.OBJECT: ObjectProperty,
         }

@@ -1,11 +1,10 @@
 
 from schemaform.base_property import BaseProperty
 from schemaform.helpers import el
+from schemaform.helpers import get_type_from_schema
+from schemaform.types import Types
 
-STRING_TYPE = 'string'
-INTEGER_TYPE = 'integer'
-NUMBER_TYPE = 'number'
-EXPECTED_PROPERTY_TYPES = [INTEGER_TYPE, NUMBER_TYPE, STRING_TYPE]
+EXPECTED_PROPERTY_TYPES = [Types.INTEGER, Types.NUMBER, Types.STRING]
 
 class SingleInputProperty(BaseProperty):
     """A SingleInputProperty represents a property that represents a single
@@ -28,15 +27,12 @@ class SingleInputProperty(BaseProperty):
             property_dict,
         )
 
-        self._property_type = property_dict.get('type', STRING_TYPE)
-        self._validate_property_type()
+        self._validate_single_input_property()
 
-    def _validate_property_type(self):
-        if self._property_type not in EXPECTED_PROPERTY_TYPES:
+    def _validate_single_input_property(self):
+        if get_type_from_schema(self.property_dict) not in EXPECTED_PROPERTY_TYPES:
             raise ValueError(
-                'Unexpected type for single input property: %s' % (
-                    self._property_type,
-                )
+                'Unexpected type for single input property.'
             )
 
     def __pq__(self):

@@ -1,9 +1,12 @@
 
+import collections
 import pyquery
 import jsonschema
 import testify as T
 
+from schemaform.helpers import combine_pqable_objects
 from schemaform.helpers import el
+from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import validate_default_value
 from schemaform.helpers import validate_enum_values
 from schemaform.helpers import validate_schema_against_draft4
@@ -80,3 +83,64 @@ class TestValidateEnumValues(T.TestCase):
     def test_invalid_enum(self):
         with T.assert_raises(jsonschema.ValidationError):
             validate_enum_values({'type': 'integer', 'enum': [1, 2.5, 3]})
+
+class TestGetTypeFromschema(T.TestCase):
+
+    def test_get_type_from_schema_enum(self):
+        schema_type = get_type_from_schema({'enum': ['a', 'b', 'c']})
+        T.assert_equal(schema_type, 'enum')
+
+    def test_get_type_from_schema_not_specified(self):
+        schema_type = get_type_from_schema({})
+        T.assert_equal(schema_type, 'string')
+
+    def test_get_type_from_schema_specified(self):
+        schema_type = get_type_from_schema({'type': 'foo'})
+        T.assert_equal(schema_type, 'foo')
+
+
+class TestCombinePqableObjects(T.TestCase):
+    class Pqable(object):
+        def __pq__(self):
+            return el('div', text='pqable')
+
+    class IterablePqable(collections.namedtuple('Foo', ['bar'])):
+        def __pq__(self):
+            return el('div', text=self.bar)
+
+    class IterablePqable2(collections.namedtuple('Bar', ['baz'])):
+        def __pq__(self):
+            return el('div', text=self.baz)
+
+    def test_combine_pqable_objects(self):
+        ret = combine_pqable_objects(
+            pyquery.PyQuery('<div>'),
+            [pyquery.PyQuery('<div>'), pyquery.PyQuery('<span>')],
+            self.Pqable(),
+            [self.Pqable(), self.Pqable()],
+        )
+        T.assert_equal(
+            ret.__html__(),
+            pyquery.PyQuery(
+                '<div/><div/><span/><div>pqable</div><div>pqable</div><div>pqable</div>',
+                parser='html_fragments',
+            ).__html__(),
+        )
+
+    def test_combine_pqable_objects_with_acceptable_iterable_type(self):
+        ret = combine_pqable_objects(
+            self.IterablePqable('foo'),
+            acceptable_iterable_type=self.IterablePqable
+        )
+        T.assert_equal(ret.__html__(), '<div>foo</div>')
+
+    def test_combine_pqable_objects_with_acceptable_iterable_types(self):
+        ret = combine_pqable_objects(
+            self.IterablePqable('foo'),
+            self.IterablePqable2('baz'),
+            acceptable_iterable_type=[
+                self.IterablePqable,
+                self.IterablePqable2,
+            ],
+        )
+        T.assert_equal(ret.__html__(), '<div>foo</div><div>baz</div>')

@@ -1,6 +1,8 @@
 
 from schemaform.base_property import BaseProperty
 from schemaform.helpers import el
+from schemaform.helpers import get_type_from_schema
+from schemaform.types import Types
 
 class BooleanProperty(BaseProperty):
     """A BooleanProperty represents a property that represents a boolean."""
@@ -21,12 +23,15 @@ class BooleanProperty(BaseProperty):
             property_dict,
         )
 
-        if property_dict['type'] != 'boolean':
+        self._validate_boolean_property()
+
+    def _validate_boolean_property(self):
+        if get_type_from_schema(self.property_dict) != Types.BOOLEAN:
             raise ValueError('Unexpected schema for boolean property.')
 
     def __pq__(self):
         """Returns the pyquery object representing this object."""
-        label_text = self.property_dict.get('label', self.property_name.title())
+        label_text = self.get_label_text()
         input_name = self.get_input_name()
         input_id = 'id_' + input_name
 

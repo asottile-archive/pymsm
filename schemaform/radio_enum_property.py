@@ -1,9 +1,12 @@
+
 import collections
 import itertools
-import pyquery
 
 from schemaform.base_property import BaseProperty
+from schemaform.helpers import combine_pqable_objects
 from schemaform.helpers import el
+from schemaform.helpers import get_type_from_schema
+from schemaform.types import Types
 
 class RadioInput(collections.namedtuple(
     'RadioInput', ['name', 'value', 'label', 'checked']
@@ -53,7 +56,7 @@ class RadioEnumProperty(BaseProperty):
         self._validate_enum()
 
     def _validate_enum(self):
-        if 'enum' not in self.property_dict:
+        if get_type_from_schema(self.property_dict) != Types.ENUM:
             raise ValueError('Unexpected schema for enum property.')
 
         # Validate our labels extension
@@ -89,10 +92,11 @@ class RadioEnumProperty(BaseProperty):
 
     def __pq__(self):
         """Returns the pyquery object representing this object."""
-        inputs = [input.__pq__() for input in self._get_inputs()]
-        inputs_as_pyquery = pyquery.PyQuery(list(itertools.chain(*inputs)))
-        label = self.get_label_text()
-        legend = el('legend', text=label)
-        radio_contents = legend + inputs_as_pyquery
+        legend = el('legend', text=self.get_label_text())
+        radio_contents = combine_pqable_objects(
+            legend, self._get_inputs(),
+            acceptable_iterable_type=RadioInput,
+        )
+
         radio_contents.wrap(el('fieldset').__html__())
         return radio_contents
