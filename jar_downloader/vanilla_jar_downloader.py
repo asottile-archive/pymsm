@@ -62,14 +62,17 @@ class VanillaJarDownloader(JarDownloaderBase):
         """
         return {
             'type': 'object',
+            'label': 'Vanilla Jar Downloader',
             'properties': {
                 'jar_type': {
-                    'title': 'Jar Type',
+                    'type': 'string',
+                    'label': 'Jar Type',
                     'enum': [RELEASE, SNAPSHOT],
                     'labels': [RELEASE.title(), SNAPSHOT.title()],
                     'default': RELEASE,
                 },
             },
+            'propertyOrder': ['jar_type'],
             'required': ['jar_type',],
         }
 
