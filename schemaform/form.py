@@ -37,7 +37,7 @@ class Form(object):
 
     def __pq__(self):
         """Returns the pyquery representation of this object."""
-        contents = ObjectProperty(
+        contents = self.get_property_type_cls_map()[Types.OBJECT](
             '',
             '',
             self.schema,
