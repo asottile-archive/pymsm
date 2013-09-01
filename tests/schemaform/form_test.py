@@ -1,6 +1,8 @@
 
 import jsonschema
+import markupsafe
 import mock
+import pyquery
 import testify as T
 
 from schemaform.form import Form
@@ -44,3 +46,13 @@ class TestForm(T.TestCase):
                 '', '', schema, get_property_type_cls_map_mock.return_value
             )
             T.assert_equal(pq, ObjectProperty_mock().__pq__().wrapAll())
+
+    def test_markup_returns_blessed_html(self):
+        markup = Form({'type': 'object', 'properties': {'foo': {}}}).markup
+        T.assert_isinstance(markup, markupsafe.Markup)
+        # Make sure that we actually got html out when it gets stringified
+        # TODO: Kind of a weak assertion
+        T.assert_equal(
+            pyquery.PyQuery(str(markup)).is_('form'),
+            True,
+        )
