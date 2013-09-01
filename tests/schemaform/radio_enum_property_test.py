@@ -103,6 +103,12 @@ class TestRadioEnumProperty(T.TestCase):
         elements = self.get_elements({'enum': values, 'default': default})
         T.assert_equal(elements.fieldset.find(':checked').val(), default)
 
+    def test_all_are_radios(self):
+        elements = self.get_elements({'enum': ['herp', 'derp']})
+        for input in elements.inputs:
+            T.assert_equal(input.attr('type'), 'radio')
+
+
 class TestRadioInput(T.TestCase):
 
     name = 'foo'

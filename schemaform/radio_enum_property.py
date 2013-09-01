@@ -23,6 +23,7 @@ class RadioInput(collections.namedtuple(
             'id': self.id,
             'name': self.name,
             'value': self.value,
+            'type': 'radio',
         }
 
         if self.checked:
