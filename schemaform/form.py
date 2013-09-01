@@ -1,6 +1,4 @@
 
-import markupsafe
-
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import el
@@ -46,9 +44,3 @@ class Form(object):
             self.get_property_type_cls_map()
         ).__pq__()
         return contents.wrapAll(el('form', **self.form_attrs).__html__())
-
-    @property
-    def markup(self):
-        """Returns blessed string of markup."""
-        # At this point we trust our stuff.
-        return markupsafe.Markup(self.__pq__().__html__())

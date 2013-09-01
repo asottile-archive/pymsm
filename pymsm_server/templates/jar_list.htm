@@ -1,0 +1,11 @@
+{% extends "base.htm" %}
+
+{% block title %}Index{% endblock %}
+
+{% block body %}
+  {* TODO: Print out already installed jars here *}
+  {% if is_internal %}
+    <a href="{{ url_for('jar_list') }}">Jar List</a>
+  {% endif %}
+  Hello World
+{% endblock %}

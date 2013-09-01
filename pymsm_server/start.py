@@ -29,7 +29,7 @@ def available_jars():
 @require_internal
 def jar_list():
     jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
-    return render_template('jar_list.htm')
+    return render_template('jar_list.htm', jar_downloaders=jar_downloaders)
 
 @app.route('/<path:path>')
 def catch_all(path):
