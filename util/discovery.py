@@ -17,10 +17,6 @@ def get_module_name(root, filename):
     if not filename.endswith('.py'):
         raise ValueError('filename must end with .py')
 
-    # Adjust for paths like './foo/bar.py'
-    if root.startswith('./'):
-        root = root[2:]
-
     filename = filename[:-3]
     joined_path = os.path.join(root, filename)
     relpath = os.path.relpath(joined_path, config.application.APP_ROOT)
