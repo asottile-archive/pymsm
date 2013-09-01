@@ -5,6 +5,7 @@ import simplejson
 
 from jar_downloader.discovery import get_jar_downloaders
 from util.decorators import require_internal
+from util.flask_helpers import render_template
 
 EXTENSIONS_TO_MIMETYPES = {
     '.js': 'application/javascript',
@@ -15,7 +16,7 @@ app = flask.Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    return flask.render_template('index.htm')
+    return render_template('index.htm')
 
 @app.route('/available_jars', methods=['GET'])
 @require_internal
@@ -28,7 +29,7 @@ def available_jars():
 @require_internal
 def jar_list():
     jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
-    return flask.render_template('jar_list.htm')
+    return render_template('jar_list.htm')
 
 @app.route('/<path:path>')
 def catch_all(path):
