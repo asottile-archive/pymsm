@@ -17,3 +17,7 @@ def is_jar_downloader(cls):
 def get_jar_downloaders():
     """Returns a list of classes that are JarDownloaders."""
     return discover(JAR_DOWNLOADER_DIRECTORY, is_jar_downloader)
+
+def get_jar_downloader_map():
+    """Returns a dict that maps name to jar downloader class."""
+    return dict((jar.__name__, jar) for jar in get_jar_downloaders())

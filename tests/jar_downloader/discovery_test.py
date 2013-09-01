@@ -1,7 +1,10 @@
 
+import mock
 import testify as T
 
+import jar_downloader.discovery
 from jar_downloader.discovery import get_jar_downloaders
+from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import is_jar_downloader
 from jar_downloader.jar_downloader_base import JarDownloaderBase
 
@@ -36,3 +39,18 @@ class TestGetJarDownloaders(T.TestCase):
     # XXX: this method is pretty nuts so this is more of a smoke test
     def test_get_jar_downloaders(self):
         assert get_jar_downloaders()
+
+
+class TestGetJarDownloaderMap(T.TestCase):
+    def test_get_jar_downloader_map(self):
+        class Foo: pass
+        class Bar: pass
+
+        with mock.patch.object(
+            jar_downloader.discovery,
+            'get_jar_downloaders',
+            autospec=True,
+        ) as get_jar_downloaders_mock:
+            get_jar_downloaders_mock.return_value = set([Foo, Bar])
+            ret = get_jar_downloader_map()
+            T.assert_equal(ret, {'Foo': Foo, 'Bar': Bar})

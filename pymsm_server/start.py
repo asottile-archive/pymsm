@@ -1,10 +1,8 @@
 
 import flask
 import os.path
-import simplejson
 
-from jar_downloader.discovery import get_jar_downloaders
-from util.decorators import require_internal
+from pymsm_server.jar_creation import jar_creation
 from util.flask_helpers import render_template
 
 EXTENSIONS_TO_MIMETYPES = {
@@ -13,23 +11,11 @@ EXTENSIONS_TO_MIMETYPES = {
 }
 
 app = flask.Flask(__name__)
+app.register_blueprint(jar_creation)
 
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.htm')
-
-@app.route('/available_jars', methods=['GET'])
-@require_internal
-def available_jars():
-    jar_downloaders = get_jar_downloaders()
-    jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
-    return simplejson.dumps(jar_downloaders)
-
-@app.route('/jar_list', methods=['GET'])
-@require_internal
-def jar_list():
-    jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
-    return render_template('jar_list.htm', jar_downloaders=jar_downloaders)
 
 @app.route('/<path:path>')
 def catch_all(path):

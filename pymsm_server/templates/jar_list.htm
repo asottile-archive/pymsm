@@ -1,11 +1,16 @@
 {% extends "base.htm" %}
 
-{% block title %}Index{% endblock %}
+{% block title %}Jars!{% endblock %}
 
 {% block body %}
-  {* TODO: Print out already installed jars here *}
-  {% if is_internal %}
-    <a href="{{ url_for('jar_list') }}">Jar List</a>
-  {% endif %}
-  Hello World
+  {# TODO: Print out already installed jars here #}
+  <ul>
+    {% for jar_downloader in jar_downloaders %}
+      <li>
+        <a href="{{ jar_downloader.url }}">
+          Create new {{ jar_downloader.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}
