@@ -2,6 +2,8 @@
 import flask
 import functools
 
+from util.flask_helpers import is_internal
+
 _NONE_PASSED = object()
 
 def require_internal(func=_NONE_PASSED):
@@ -23,7 +25,7 @@ def require_internal(func=_NONE_PASSED):
             directly and should just check the assertion.
     """
     if func is _NONE_PASSED:
-        if flask.request.remote_addr != '127.0.0.1':
+        if not is_internal():
             flask.abort(403)
         return
 

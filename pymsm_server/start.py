@@ -21,15 +21,29 @@ def index():
 @require_internal
 def available_jars():
     jar_downloaders = get_jar_downloaders()
-    jar_downloader_names = [
-        jar_downloader.__name__ for jar_downloader in jar_downloaders
-    ]
-    return simplejson.dumps(jar_downloader_names)
+    jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
+    return simplejson.dumps(jar_downloaders)
+
+@app.route('/jar_list', methods=['GET'])
+@require_internal
+def jar_list():
+    jar_downloaders = map(lambda jar: jar.__name__, get_jar_downloaders())
+    return flask.render_template('jar_list.htm')
 
 @app.route('/<path:path>')
 def catch_all(path):
+    # I assume there's a better way to serve static assets
     if not app.debug:
         flask.abort(404)
+
+    # Don't want to serve files that aren't of the type we expect
+    if not any(
+        path.endswith(extension)
+        for extension in EXTENSIONS_TO_MIMETYPES.keys()
+    ):
+        flask.abort(404)
+
+    # Try and serve that file
     try:
         # Make the paths relative to where this file is
         path = os.path.join(

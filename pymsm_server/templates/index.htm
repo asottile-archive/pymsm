@@ -3,5 +3,8 @@
 {% block title %}Index{% endblock %}
 
 {% block body %}
+  {% if is_internal %}
+    <a href="{{ url_for('jar_list') }}">Jar List</a>
+  {% endif %}
   Hello World
 {% endblock %}
