@@ -2,28 +2,8 @@
 import testify as T
 
 from jar_downloader.discovery import get_jar_downloaders
-from jar_downloader.discovery import get_module_name
 from jar_downloader.discovery import is_jar_downloader
 from jar_downloader.jar_downloader_base import JarDownloaderBase
-
-class TestGetModuleName(T.TestCase):
-    """Tests the get_module_name function."""
-
-    def test_get_module_name(self):
-        module_name = get_module_name('foo', 'bar.py')
-        T.assert_equal(module_name, 'foo.bar')
-
-    def test_raises_on_non_python_file(self):
-        with T.assert_raises(ValueError):
-            get_module_name('foo', 'bar')
-
-    def test_more_complicated_directory(self):
-        module_name = get_module_name('foo/bar', 'baz.py')
-        T.assert_equal(module_name, 'foo.bar.baz')
-
-    def test_strips_prefixing_dot_slash(self):
-        module_name = get_module_name('./foo', 'bar.py')
-        T.assert_equal(module_name, 'foo.bar')
 
 class TestIsJarDownloader(T.TestCase):
     """Tests the is_jar_downloader method."""
