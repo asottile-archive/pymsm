@@ -1,6 +1,8 @@
 
+from jar_downloader.jar_downloader_base import JarDownloaderBase
 from jar_downloader.vanilla_jar_downloader import RELEASE
 from jar_downloader.vanilla_jar_downloader import SNAPSHOT
+from schemaform.helpers import validate_schema_against_draft4
 
 NO_ARG = object()
 
@@ -59,3 +61,31 @@ def get_fake_versions_json(
             SNAPSHOT: snapshot_version,
         }
     }
+
+def get_fake_jar_downloader_cls(name=NO_ARG, config_schema=NO_ARG):
+    if name is NO_ARG:
+        name = 'FakeJarDownloader'
+
+    if config_schema is NO_ARG:
+        config_schema = {
+            'type': 'object',
+            'properties': {
+                'foo': {},
+                'bar': {},
+            },
+            'propertyOrder': ['foo', 'bar'],
+        }
+
+    # Validate arguments
+    assert name
+    validate_schema_against_draft4(config_schema)
+
+    fake_jar_downloader_cls = type(
+        name,
+        (JarDownloaderBase,),
+        {
+            'get_config_schema': classmethod(lambda cls: config_schema),
+        },
+    )
+
+    return fake_jar_downloader_cls
