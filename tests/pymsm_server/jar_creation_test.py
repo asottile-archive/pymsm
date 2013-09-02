@@ -67,3 +67,13 @@ class TestGetJarCreateForm(T.TestCase):
         T.assert_isinstance(ret, markupsafe.Markup)
         ret_pq = pyquery.PyQuery(ret)
         T.assert_equal(ret_pq.find('input[type=hidden]').val(), jar_name)
+
+    def test_has_input_for_name(self):
+        ret = get_jar_create_form('A')
+        ret_pq = pyquery.PyQuery(ret)
+        T.assert_length(ret_pq.find('input[type=submit]'), 1)
+
+    def test_has_input_for_user_jar_name(self):
+        ret = get_jar_create_form('B')
+        ret_pq = pyquery.PyQuery(ret)
+        T.assert_length(ret_pq.find('input[name=user_jar_name]'), 1)
