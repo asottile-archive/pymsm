@@ -7,9 +7,12 @@ import testify as T
 from schemaform.helpers import combine_pqables
 from schemaform.helpers import el
 from schemaform.helpers import get_type_from_schema
+from schemaform.helpers import get_value_type_from_schema
+from schemaform.helpers import transform_value
 from schemaform.helpers import validate_default_value
 from schemaform.helpers import validate_enum_values
 from schemaform.helpers import validate_schema_against_draft4
+from schemaform.types import Types
 
 class TestEl(T.TestCase):
     """Some basic tests for the element helper."""
@@ -84,20 +87,35 @@ class TestValidateEnumValues(T.TestCase):
         with T.assert_raises(jsonschema.ValidationError):
             validate_enum_values({'type': 'integer', 'enum': [1, 2.5, 3]})
 
-class TestGetTypeFromschema(T.TestCase):
+class TestGetTypeFromSchema(T.TestCase):
 
     def test_get_type_from_schema_enum(self):
         schema_type = get_type_from_schema({'enum': ['a', 'b', 'c']})
-        T.assert_equal(schema_type, 'enum')
+        T.assert_equal(schema_type, Types.ENUM)
 
     def test_get_type_from_schema_not_specified(self):
         schema_type = get_type_from_schema({})
-        T.assert_equal(schema_type, 'string')
+        T.assert_equal(schema_type, Types.STRING)
 
     def test_get_type_from_schema_specified(self):
         schema_type = get_type_from_schema({'type': 'foo'})
         T.assert_equal(schema_type, 'foo')
 
+
+class TestGetValueTypeFromSchema(T.TestCase):
+    def test_default_type_returns_string(self):
+        value_type = get_value_type_from_schema({})
+        T.assert_equal(value_type, Types.STRING)
+
+    def test_enum_gives_value_type(self):
+        value_type = get_value_type_from_schema({
+            'enum': [1, 2, 3], 'type': 'integer'
+        })
+        T.assert_equal(value_type, Types.INTEGER)
+
+    def test_arbitrary_type(self):
+        value_type = get_value_type_from_schema({'type': 'foo'})
+        T.assert_equal(value_type, 'foo')
 
 class TestCombinePqableObjects(T.TestCase):
     class Pqable(object):
@@ -144,3 +162,35 @@ class TestCombinePqableObjects(T.TestCase):
             ],
         )
         T.assert_equal(ret.__html__(), '<div>foo</div><div>baz</div>')
+
+
+class TestTransformValue(T.TestCase):
+
+    def test_transforms_int(self):
+        ret = transform_value('1', {'type': Types.INTEGER})
+        T.assert_equal(ret, 1)
+
+    def test_transform_boolean(self):
+        ret = transform_value('on', {'type': Types.BOOLEAN})
+        T.assert_equal(ret, True)
+
+    def test_transform_boolean_falsey(self):
+        ret = transform_value(None, {'type': Types.BOOLEAN})
+        T.assert_equal(ret, False)
+
+    def test_transform_number(self):
+        ret = transform_value('1.5', {'type': Types.NUMBER})
+        T.assert_equal(ret, 1.5)
+
+    def test_transform_bad_value_returns_value(self):
+        bad_value = 'abc'
+        ret = transform_value(bad_value, {'type': Types.INTEGER})
+        T.assert_is(ret, bad_value)
+
+    def test_noop_passthrough(self):
+        value = 'foo'
+        ret = transform_value(value, {'type': Types.STRING})
+        T.assert_is(ret, value)
+
+if __name__ == '__main__':
+    T.run()

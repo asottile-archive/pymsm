@@ -2,6 +2,7 @@
 import testify as T
 
 from util.dicts import get_deep
+from util.dicts import set_deep
 
 class TestGetDeep(T.TestCase):
     sample_dict = {
@@ -48,3 +49,30 @@ class TestGetDeep(T.TestCase):
             get_deep(self.sample_dict, 'a.b.e.d', sentient),
             sentient,
         )
+
+
+class TestSetDeep(T.TestCase):
+    def test_set_deep_simple(self):
+        foo = {}
+        value = 'bar'
+        set_deep(foo, 'a', value)
+        T.assert_is(foo['a'], value)
+
+    def test_set_deep_deeper(self):
+        foo = {}
+        value = 'bar'
+        set_deep(foo, 'a.b.c', value)
+        T.assert_is(foo['a']['b']['c'], value)
+
+    def test_set_deep_value_exists(self):
+        foo = {
+            'a': {
+                'b': 'c',
+            },
+        }
+        value = 'd'
+        set_deep(foo, 'a.b', value)
+        T.assert_is(foo['a']['b'], value)
+
+if __name__ == '__main__':
+    T.run()

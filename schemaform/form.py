@@ -1,4 +1,5 @@
 
+from util.dicts import get_deep
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import el
@@ -34,6 +35,42 @@ class Form(object):
             Types.ENUM: RadioEnumProperty,
             Types.OBJECT: ObjectProperty,
         }
+
+    def load_from_form(self, form, tolerate_extra_keys=True):
+        """Loads data from a form (or dictlike).
+
+        The form should be like one you would get from a POST of the result of
+        the __pq__ method.  Where the keys are paths (like 'foo.bar') and
+        the values are the values.
+
+        Returns:
+            values, errors
+            values - The dictionary retrieved from the processing of form
+            errors - Any errors encountered while loading.
+
+        Args:
+            form - dictlike object where keys are paths like 'foo.bar'
+            tolerate_extra_keys - Whether to allow stuff not in the schema
+        """
+
+        values = {}
+        errors = {}
+
+        for key, value in form.iteritems():
+            value_schema = get_deep(self.schema, key)
+            if not value_schema and not tolerate_extra_keys:
+                errors[key] = 'Unexpected key'
+            else:
+                # TODO:
+                # try:
+                #     new_value = transform_value(value, value_schema)
+                #     jsonschema.validate(new_value, value_schema)
+                #     set_deep(values, key, new_value)
+                # except:
+                #     errors[key] = 'Validation Error'
+                pass
+
+        return values, errors
 
     def __pq__(self):
         """Returns the pyquery representation of this object."""

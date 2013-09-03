@@ -54,6 +54,14 @@ def get_type_from_schema(schema):
 
     return schema.get('type', Types.STRING)
 
+def get_value_type_from_schema(schema):
+    """Returns the value type of the things in the schema.  Note that you
+    probably in most cases want get_type_from_schema, the only difference
+    between this and that one is this one will return the enum's base type
+    instead of Types.ENUM.
+    """
+    return schema.get('type', Types.STRING)
+
 def combine_pqables(*args, **kwargs):
     """Combines pyquery object or objects which implement __pq__ into a single
     pyquery object.
@@ -86,3 +94,24 @@ def combine_pqables(*args, **kwargs):
         )
     )
     return pyquery.PyQuery(list(itertools.chain(*to_pyquery)))
+
+def transform_value_noop(value):
+    return value
+
+TRANSFORM_FUNCTIONS = {
+    Types.OBJECT: transform_value_noop,
+    Types.STRING: transform_value_noop,
+    Types.INTEGER: int,
+    Types.NUMBER: float,
+    Types.BOOLEAN: bool,
+}
+
+def transform_value(value, schema):
+    value_type = get_value_type_from_schema(schema)
+
+    # In the error case we just return the value -- A validator will invalidate
+    # this value regardless
+    try:
+        return TRANSFORM_FUNCTIONS[value_type](value)
+    except ValueError:
+        return value

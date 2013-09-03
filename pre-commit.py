@@ -37,6 +37,11 @@ TESTS = [
         True, 'testipdb',
     ),
     Test(
+        "%s | grep 'tests' | grep -v '_test.py$' | grep -v '__init__.py'" % PY_FILES,
+        'Py    - Test files should end in _test.py',
+        True, 'testtestnames',
+    ),
+    Test(
         "%s | xargs grep -H -n -P '\t'" % ALL_FILES,
         "All   - No tabs",
         True, 'testtabs',
