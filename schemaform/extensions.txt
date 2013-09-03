@@ -10,3 +10,6 @@ Enum properties have an optional 'labels' property which is an array of strings
 Object properties have an optional property 'propertyOrder' which is an array
     of property names.  If absent, the order is unspecified (and really sucks).
 
+
+TODO:
+    maybe add input_type to string inputs so they could specify file or password
