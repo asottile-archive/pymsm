@@ -115,3 +115,22 @@ def transform_value(value, schema):
         return TRANSFORM_FUNCTIONS[value_type](value)
     except ValueError:
         return value
+
+def _flatten_schema_helper(schema, path, out_schema):
+    if get_type_from_schema(schema) == Types.OBJECT:
+        for key, value in schema['properties'].iteritems():
+            _flatten_schema_helper(
+                value,
+                # This oddness prevents the leading '.' for keys
+                # For example (without ths):
+                # {'.a.b': 'c'} from {'a': {'b': 'c'}}
+                '.'.join(part for part in [path, key] if part),
+                out_schema,
+            )
+    else:
+        out_schema[path] = schema
+
+def flatten_schema(schema):
+    out_schema = {}
+    _flatten_schema_helper(schema, '', out_schema)
+    return out_schema

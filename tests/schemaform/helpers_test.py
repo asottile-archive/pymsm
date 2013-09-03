@@ -6,6 +6,7 @@ import testify as T
 
 from schemaform.helpers import combine_pqables
 from schemaform.helpers import el
+from schemaform.helpers import flatten_schema
 from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import get_value_type_from_schema
 from schemaform.helpers import transform_value
@@ -192,5 +193,28 @@ class TestTransformValue(T.TestCase):
         ret = transform_value(value, {'type': Types.STRING})
         T.assert_is(ret, value)
 
+class TestFlattenSchema(T.TestCase):
+    def test_flatten_schema_trivial(self):
+        in_schema = {'type': 'object', 'properties': {'foo': {}, 'bar': {}}}
+        out_schema = flatten_schema(in_schema)
+        T.assert_equal(out_schema, {'foo': {}, 'bar': {}})
+
+    def test_flatten_schema_nested(self):
+        in_schema = {
+            'type': 'object',
+            'properties': {
+                'a': {
+                    'type': 'object',
+                    'properties': {
+                        'b': {},
+                    },
+                },
+                'd': {},
+            }
+        }
+        out_schema = flatten_schema(in_schema)
+        T.assert_equal(out_schema, {'a.b': {}, 'd': {}})
+
 if __name__ == '__main__':
     T.run()
+

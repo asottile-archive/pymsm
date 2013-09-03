@@ -1,9 +1,9 @@
 
-from util.dicts import flatten
 from util.dicts import get_deep
 from util.dicts import set_deep
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
+from schemaform.helpers import flatten_schema
 from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import el
 from schemaform.helpers import validate_schema_against_draft4
@@ -77,7 +77,7 @@ class Form(object):
         # This oddness is because checkboxes pass no value if unchecked in forms
         # So we need to iterate through all of the boolean schemas in this
         # schema and if they are unset, we need to set them to False
-        for sub_schema_path, sub_schema in flatten(self.schema):
+        for sub_schema_path, sub_schema in flatten_schema(self.schema):
             if (
                 get_type_from_schema(sub_schema) == Types.BOOLEAN and
                 get_deep(values, sub_schema_path) is None

@@ -48,7 +48,8 @@ def _flatten_helper(dict, path, outdict):
             _flatten_helper(
                 value,
                 # This oddness prevents the leading '.' for keys
-                # For example: {'.a.b': 'c'} from {'a': {'b': 'c'}}
+                # For example (without this):
+                # {'.a.b': 'c'} from {'a': {'b': 'c'}}
                 '.'.join(part for part in [path, key] if part),
                 outdict,
             )
