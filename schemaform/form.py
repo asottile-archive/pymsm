@@ -66,9 +66,16 @@ class Form(object):
                 #     new_value = transform_value(value, value_schema)
                 #     jsonschema.validate(new_value, value_schema)
                 #     set_deep(values, key, new_value)
-                # except:
+                # except jsonschema.ValidationError:
                 #     errors[key] = 'Validation Error'
                 pass
+
+        # TODO: booleans are a special snowflake and pass the value 'on'
+        # or don't pass a value at all.  So I'll need to iterate through all
+        # boolean properties and set 'False' in case they aren't set.
+
+        # TODO: I think there's an iterative version of the following:
+        # jsonschema.validate(values, self.schema)
 
         return values, errors
 
