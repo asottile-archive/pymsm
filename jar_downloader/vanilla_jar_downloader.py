@@ -73,7 +73,7 @@ class VanillaJarDownloader(JarDownloaderBase):
                 },
             },
             'propertyOrder': ['jar_type'],
-            'required': ['jar_type',],
+            'required': ['jar_type'],
         }
 
     @property

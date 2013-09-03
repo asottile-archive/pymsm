@@ -1,7 +1,10 @@
 
+from util.dicts import flatten
 from util.dicts import get_deep
+from util.dicts import set_deep
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
+from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import el
 from schemaform.helpers import validate_schema_against_draft4
 from schemaform.object_property import ObjectProperty
@@ -70,9 +73,16 @@ class Form(object):
                 #     errors[key] = 'Validation Error'
                 pass
 
-        # TODO: booleans are a special snowflake and pass the value 'on'
-        # or don't pass a value at all.  So I'll need to iterate through all
-        # boolean properties and set 'False' in case they aren't set.
+        # TODO: split this into another function
+        # This oddness is because checkboxes pass no value if unchecked in forms
+        # So we need to iterate through all of the boolean schemas in this
+        # schema and if they are unset, we need to set them to False
+        for sub_schema_path, sub_schema in flatten(self.schema):
+            if (
+                get_type_from_schema(sub_schema) == Types.BOOLEAN and
+                get_deep(values, sub_schema_path) is None
+            ):
+                set_deep(values, sub_schema_path, False)
 
         # TODO: I think there's an iterative version of the following:
         # jsonschema.validate(values, self.schema)
@@ -88,3 +98,4 @@ class Form(object):
             self.get_property_type_cls_map()
         ).__pq__()
         return contents.wrapAll(el('form', **self.form_attrs).__html__())
+
