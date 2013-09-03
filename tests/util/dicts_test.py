@@ -1,6 +1,7 @@
 
 import testify as T
 
+from util.dicts import flatten
 from util.dicts import get_deep
 from util.dicts import set_deep
 
@@ -73,6 +74,18 @@ class TestSetDeep(T.TestCase):
         value = 'd'
         set_deep(foo, 'a.b', value)
         T.assert_is(foo['a']['b'], value)
+
+
+class FlattenTest(T.TestCase):
+    def test_flatten_trivial(self):
+        in_dict = {'a': 'b', 'c': 'd'}
+        out_dict = flatten(in_dict)
+        T.assert_equal(in_dict, out_dict)
+
+    def test_flatten_nested(self):
+        in_dict = {'a': {'b': 'c'}, 'd': 'e'}
+        out_dict = flatten(in_dict)
+        T.assert_equal(out_dict, {'a.b': 'c', 'd': 'e'})
 
 if __name__ == '__main__':
     T.run()

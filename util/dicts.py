@@ -40,3 +40,22 @@ def set_deep(dictlike, path, value):
             dictlike = dictlike[path_part]
 
     dictlike[path_parts[-1]] = value
+
+
+def _flatten_helper(dict, path, outdict):
+    try:
+        for key, value in dict.iteritems():
+            _flatten_helper(
+                value,
+                # This oddness prevents the leading '.' for keys
+                # For example: {'.a.b': 'c'} from {'a': {'b': 'c'}}
+                '.'.join(part for part in [path, key] if part),
+                outdict,
+            )
+    except AttributeError:
+        outdict[path] = dict
+
+def flatten(dict):
+    outdict = {}
+    _flatten_helper(dict, '', outdict)
+    return outdict
