@@ -3,9 +3,11 @@ import contextlib
 import flask
 import mock
 import testify as T
+import time
 import werkzeug.exceptions
 
 from util.auto_namedtuple import auto_namedtuple
+from util.decorators import cached_property
 from util.decorators import require_internal
 
 class TestRequireInternal(T.TestCase):
@@ -55,6 +57,21 @@ class TestRequireInternal(T.TestCase):
            T.assert_raises(werkzeug.exceptions.Forbidden),
        ):
            require_internal()
+
+
+class TestCachedProperty(T.TestCase):
+
+    class Foo(object):
+        @cached_property
+        def foo(self):
+            return "Foo" + str(time.time())
+
+    def test_cached_property(self):
+        instance = self.Foo()
+        val = instance.foo
+        val2 = instance.foo
+        T.assert_is(val, val2)
+
 
 if __name__ == '__main__':
     T.run()

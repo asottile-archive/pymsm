@@ -44,3 +44,37 @@ class TestForm(T.TestCase):
                 '', '', schema, get_property_type_cls_map_mock.return_value
             )
             T.assert_equal(pq, ObjectProperty_mock().__pq__().wrapAll())
+
+    def test_flattened_schema(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {
+                'foo': {
+                    'type': 'object',
+                    'properties': {'bar': {}, 'baz': {}},
+                },
+                'womp': {},
+            }
+        })
+        T.assert_equal(
+            instance._flattened_schema,
+            {'foo.bar': {}, 'foo.baz': {}, 'womp': {}}
+        )
+
+    def test_load_data_from_form_missing_values_does_nothing(self):
+        instance = Form({'type': 'object', 'properties': {'a': {}, 'b': {}}})
+        T.assert_equal(instance._load_data_from_form({}), {})
+
+    def test_load_data_from_form_missing_boolean_sets_false(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'a': {'type': 'boolean'}},
+        })
+        T.assert_equal(instance._load_data_from_form({}), {'a': False})
+
+    def test_load_data_from_form_loads_data(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'a': {'type': 'integer'}},
+        })
+        T.assert_equal(instance._load_data_from_form({'a': '1'}), {'a': 1})

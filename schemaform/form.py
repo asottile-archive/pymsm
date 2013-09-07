@@ -1,11 +1,12 @@
 
-from util.dicts import get_deep
+from util.decorators import cached_property
 from util.dicts import set_deep
 from schemaform.boolean_property import BooleanProperty
 from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import flatten_schema
 from schemaform.helpers import get_type_from_schema
 from schemaform.helpers import el
+from schemaform.helpers import transform_value
 from schemaform.helpers import validate_schema_against_draft4
 from schemaform.object_property import ObjectProperty
 from schemaform.single_input_property import SingleInputProperty
@@ -39,6 +40,37 @@ class Form(object):
             Types.OBJECT: ObjectProperty,
         }
 
+    @cached_property
+    def _flattened_schema(self):
+        return flatten_schema(self.schema)
+
+    def _load_data_from_form(self, form):
+        """For each value in our schema, we attempt to set it into values.
+
+        Args:
+            form - Dictlike
+        """
+        values = {}
+        # For each value in our schema we'll attempt to set values
+        for schema_path, schema in self._flattened_schema.iteritems():
+            submitted_value = form.get(schema_path)
+            # Fixes booleans, because when they are unchecked they do not send
+            # a value
+            if get_type_from_schema(schema) == Types.BOOLEAN:
+                submitted_value = bool(submitted_value)
+
+            if submitted_value is None:
+                continue
+
+            new_value = transform_value(submitted_value, schema)
+            set_deep(values, schema_path, new_value)
+
+        return values
+
+    def _validate_iterative(self, values):
+        errors = {}
+        return errors
+
     def load_from_form(self, form, tolerate_extra_keys=True):
         """Loads data from a form (or dictlike).
 
@@ -56,37 +88,8 @@ class Form(object):
             tolerate_extra_keys - Whether to allow stuff not in the schema
         """
 
-        values = {}
-        errors = {}
-
-        for key, value in form.iteritems():
-            value_schema = get_deep(self.schema, key)
-            if not value_schema and not tolerate_extra_keys:
-                errors[key] = 'Unexpected key'
-            else:
-                # TODO:
-                # try:
-                #     new_value = transform_value(value, value_schema)
-                #     jsonschema.validate(new_value, value_schema)
-                #     set_deep(values, key, new_value)
-                # except jsonschema.ValidationError:
-                #     errors[key] = 'Validation Error'
-                pass
-
-        # TODO: split this into another function
-        # This oddness is because checkboxes pass no value if unchecked in forms
-        # So we need to iterate through all of the boolean schemas in this
-        # schema and if they are unset, we need to set them to False
-        for sub_schema_path, sub_schema in flatten_schema(self.schema):
-            if (
-                get_type_from_schema(sub_schema) == Types.BOOLEAN and
-                get_deep(values, sub_schema_path) is None
-            ):
-                set_deep(values, sub_schema_path, False)
-
-        # TODO: I think there's an iterative version of the following:
-        # jsonschema.validate(values, self.schema)
-
+        values = self._load_data_from_form(form)
+        errors = self._validate_iterative(values)
         return values, errors
 
     def __pq__(self):
