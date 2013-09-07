@@ -78,3 +78,61 @@ class TestForm(T.TestCase):
             'properties': {'a': {'type': 'integer'}},
         })
         T.assert_equal(instance._load_data_from_form({'a': '1'}), {'a': 1})
+
+    def test_validate_errors_required(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'foo': {}, 'bar': {}},
+            'required': ['foo'],
+        })
+        errors = instance._validate({})
+        T.assert_equal(errors, {'foo': "'foo' is a required property"})
+
+    def test_validate_errors_typeerror(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'foo': {'type': 'number'}},
+        })
+        errors = instance._validate({'foo': 'asdf'})
+        T.assert_equal(errors, {'foo': "'asdf' is not of type 'number'"})
+
+    def test_validate_errors_enum(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'foo': {'enum': ['foo', 'bar']}},
+        })
+        errors = instance._validate({'foo': 'baz'})
+        T.assert_equal(errors, {'foo': "'baz' is not one of ['foo', 'bar']"})
+
+    def test_validate_errors_multiple_errors(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {'foo': {}, 'bar': {}},
+            'required': ['foo', 'bar'],
+        })
+        errors = instance._validate({})
+        T.assert_equal(
+            errors,
+            {
+                'foo': "'foo' is a required property",
+                'bar': "'bar' is a required property",
+            }
+        )
+
+    def test_validate_errors_no_errors(self):
+        instance = Form({'type': 'object', 'properties': {'foo': {}}})
+        errors = instance._validate({'foo': 'bar'})
+        T.assert_equal(errors, {})
+
+    def test_load_from_form_integration(self):
+        instance = Form({
+            'type': 'object',
+            'properties': {
+                'foo': {'type': 'integer'},
+                'bar': {'type': 'string'},
+            },
+            'required': ['foo', 'bar'],
+        })
+        values, errors = instance.load_from_form({'foo': '1'})
+        T.assert_equal(values, {'foo': 1})
+        T.assert_equal(errors, {'bar': "'bar' is a required property"})

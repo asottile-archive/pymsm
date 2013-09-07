@@ -6,7 +6,8 @@ import jsonschema
 import jsonschema._utils
 
 from schemaform.types import Types
-from util.flatten import flatten
+from util.iter import flatten
+from util.iter import truthy
 
 def el(element_name, **attrs):
     """Constructs a pyquery element.
@@ -124,7 +125,7 @@ def _flatten_schema_helper(schema, path, out_schema):
                 # This oddness prevents the leading '.' for keys
                 # For example (without ths):
                 # {'.a.b': 'c'} from {'a': {'b': 'c'}}
-                '.'.join(part for part in [path, key] if part),
+                '.'.join(truthy([path, key])),
                 out_schema,
             )
     else:

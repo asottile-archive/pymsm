@@ -1,6 +1,7 @@
 
 from schemaform.helpers import validate_default_value
 from schemaform.helpers import validate_enum_values
+from util.iter import truthy
 
 class BaseProperty(object):
     """Base class for all properties."""
@@ -24,10 +25,9 @@ class BaseProperty(object):
 
     def get_input_name(self):
         """Returns a dotted path that will be used as the <input> name"""
-        parts = [self.property_name]
-        if self.dotted_path_to_property:
-            parts.insert(0, self.dotted_path_to_property)
-        return '.'.join(parts)
+        return '.'.join(truthy([
+            self.dotted_path_to_property, self.property_name
+        ]))
 
     def get_label_text(self):
         return self.property_dict.get('label', self.property_name.title())

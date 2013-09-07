@@ -1,7 +1,10 @@
 
+import jsonschema.validators
+
 from util.decorators import cached_property
 from util.dicts import set_deep
 from schemaform.boolean_property import BooleanProperty
+from schemaform.error_adapter import ErrorAdapter
 from schemaform.radio_enum_property import RadioEnumProperty
 from schemaform.helpers import flatten_schema
 from schemaform.helpers import get_type_from_schema
@@ -67,11 +70,21 @@ class Form(object):
 
         return values
 
-    def _validate_iterative(self, values):
+    def _validate(self, values):
+        """Validates the values.  Returns a dictionary containing dotted path
+        mapping to error messages.
+
+        Args:
+            values - dict of values (usually returned from _load_data_from_form
+        """
         errors = {}
+        validator = jsonschema.validators.Draft4Validator(self.schema)
+        for error in validator.iter_errors(values):
+            error = ErrorAdapter.from_validation_error(error)
+            errors[error.dotted_path] = error.message
         return errors
 
-    def load_from_form(self, form, tolerate_extra_keys=True):
+    def load_from_form(self, form):
         """Loads data from a form (or dictlike).
 
         The form should be like one you would get from a POST of the result of
@@ -81,15 +94,16 @@ class Form(object):
         Returns:
             values, errors
             values - The dictionary retrieved from the processing of form
-            errors - Any errors encountered while loading.
+            errors - Any errors encountered while loading.  The errors dict
+                will have keys being dotted paths and values being the error
+                message returned from jsonschema.
 
         Args:
             form - dictlike object where keys are paths like 'foo.bar'
-            tolerate_extra_keys - Whether to allow stuff not in the schema
         """
 
         values = self._load_data_from_form(form)
-        errors = self._validate_iterative(values)
+        errors = self._validate(values)
         return values, errors
 
     def __pq__(self):

@@ -1,7 +1,8 @@
 
 import testify as T
 
-from util.flatten import flatten
+from util.iter import flatten
+from util.iter import truthy
 
 class TestFlatten(T.TestCase):
 
@@ -33,3 +34,15 @@ class TestFlatten(T.TestCase):
 
         ret = list(flatten([0, gen()]))
         T.assert_equal(ret, [0, 1, 2, 3])
+
+class TestTruthy(T.TestCase):
+    inputs_to_expected_outputs = (
+        # basic case
+        ([1, 2, 3], [1, 2, 3]),
+        ([1, 0, 2], [1, 2]),
+        ([1, None, 2], [1, 2]),
+    )
+
+    def test_truthy(self):
+        for input, expected_output in self.inputs_to_expected_outputs:
+            T.assert_equal(list(truthy(input)), expected_output)

@@ -22,3 +22,12 @@ def flatten(iterable, acceptable_iterable_type=type(None)):
         else:
             yield element
 
+def truthy(iterable):
+    """Returns a generator of the truthy things in the iterable.
+
+    Args:
+        iterable - An iterable
+    """
+    for item in iterable:
+        if item:
+            yield item

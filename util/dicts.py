@@ -1,4 +1,6 @@
 
+from util.iter import truthy
+
 def get_deep(dictlike, path, default=None):
     """Retrieves deeply into a dict.
 
@@ -50,7 +52,7 @@ def _flatten_helper(dict, path, outdict):
                 # This oddness prevents the leading '.' for keys
                 # For example (without this):
                 # {'.a.b': 'c'} from {'a': {'b': 'c'}}
-                '.'.join(part for part in [path, key] if part),
+                '.'.join(truthy([path, key])),
                 outdict,
             )
     except AttributeError:
