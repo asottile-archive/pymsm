@@ -4,7 +4,7 @@ import jsonschema
 import os.path
 import simplejson
 
-CONFIG_FILE = 'config.json'
+from jar_downloader.helpers import CONFIG_FILE
 
 class Jar(collections.namedtuple('Jar', ['filename', 'short_version'])):
     """A Jar represents a single file of a jar inside the jar_directory.

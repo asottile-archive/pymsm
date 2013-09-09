@@ -3,7 +3,6 @@ import contextlib
 import flask
 import mock
 import pyquery
-import markupsafe
 import testify as T
 
 from presentation.jar_downloader import JarDownloader
@@ -59,14 +58,6 @@ class TestGetJarCreateForm(T.TestCase):
             )
             self.url_for_mock.return_value = 'some_url'
             yield
-
-    def test_has_hidden_input(self):
-        jar_name = 'A'
-        ret = get_jar_create_form(jar_name)
-        # Should be blessed markup so it can go to the template
-        T.assert_isinstance(ret, markupsafe.Markup)
-        ret_pq = pyquery.PyQuery(ret)
-        T.assert_equal(ret_pq.find('input[type=hidden]').val(), jar_name)
 
     def test_has_input_for_name(self):
         ret = get_jar_create_form('A')

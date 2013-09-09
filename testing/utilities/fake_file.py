@@ -1,6 +1,8 @@
 
 import mock
 
+from util.iter import flatten
+
 class FakeFile(object):
     """FakeFile is useful when you want to mock the return value of
     __builtin__.open
@@ -20,6 +22,12 @@ class FakeFile(object):
                 'Tried to read a file that was not supposed to be readable'
             )
         return self.contents
+
+    @property
+    def _written_contents(self):
+        return ''.join(flatten(
+            self.write.call_args_list, acceptable_iterable_type=basestring
+        ))
 
     def __enter__(self): return self
     def __exit__(self, *args): pass

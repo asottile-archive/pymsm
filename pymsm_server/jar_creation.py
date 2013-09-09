@@ -1,10 +1,12 @@
 
 import flask
 import markupsafe
+import re
 import simplejson
 
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_jar_downloader_map
+from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
 from util.flask_helpers import render_template
 from presentation.jar_downloader import JarDownloader
@@ -15,6 +17,8 @@ from schemaform.single_input_property import SingleInputProperty
 jar_creation = flask.Blueprint(
     'jar_creation', __name__, template_folder='templates/jar_creation'
 )
+
+USER_JAR_NAME_REGEX = re.compile('^[a-zA-Z-_]+$')
 
 def get_jar_downloader_presenters():
     """Returns JarDownloader presenters for each jar downloader installed."""
@@ -40,15 +44,14 @@ def get_jar_create_form(jar_name):
     form_pq = Form(
         jar_presenter.jar_downloader_cls.get_config_schema(),
         method='POST',
-        action=flask.url_for('jar_creation.create_jar'),
+        action=flask.url_for('jar_creation.create_jar', jar_name=jar_name),
     ).__pq__()
-    jar_name_input = el('input', type='hidden', name='jar_name', value=jar_name)
     user_jar_name_input = SingleInputProperty(
         '',
         'user_jar_name',
         {'type': 'string', 'label': 'Your Jar Name'},
     )
-    form_pq.prepend(jar_name_input + user_jar_name_input.__pq__())
+    form_pq.prepend(user_jar_name_input.__pq__())
     form_pq.append(el('input', type='submit', value='Submit',))
     jar_form_markup = markupsafe.Markup(form_pq.__html__())
 
@@ -70,10 +73,29 @@ def jar_list():
 @jar_creation.route('/new_jar/<jar_name>')
 @require_internal
 def new_jar(jar_name):
-    jar_form_markup = get_jar_create_form()
+    jar_form_markup = get_jar_create_form(jar_name)
     return render_template('new_jar.htm', jar_form_markup=jar_form_markup)
 
-@jar_creation.route('/create_jar', methods=['POST'])
+@jar_creation.route('/create_jar/<jar_name>', methods=['POST'])
 @require_internal
-def create_jar():
-    return 'Hello World'
+def create_jar(jar_name):
+    jar_downloader_cls = get_jar_downloader_map()[jar_name]
+    form = Form(jar_downloader_cls.get_config_schema())
+    values, errors = form.load_from_form(flask.request.form)
+
+    user_jar_name = flask.request.form['user_jar_name']
+    if not USER_JAR_NAME_REGEX.match(user_jar_name):
+        # TODO: need to do something wtih reporting this as an error
+        assert False
+
+    if errors:
+        # TODO: need to do something with validating errors
+        assert False
+
+    # TODO: there is a ValueError to catch here for already created jar
+    # directory.  Should really make this a more specific exception and also
+    # handle it appropriately here.
+    create_jar_directory(jar_name, user_jar_name, values)
+
+    # TODO: redirect to Jars List with success message
+    return 'Jar created successfully.'
