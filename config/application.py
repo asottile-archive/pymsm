@@ -10,4 +10,4 @@ APP_ROOT = os.path.abspath(
 )
 
 DATA_PATH = os.path.join(APP_ROOT, 'data')
-JARS_DIRECTORY = os.path.join(DATA_PATH, 'jars')
+JARS_PATH = os.path.join(DATA_PATH, 'jars')

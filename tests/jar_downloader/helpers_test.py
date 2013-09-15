@@ -46,9 +46,7 @@ class TestCreateJarDirectory(T.TestCase):
         create_jar_directory(jar_name, user_jar_name, jar_config)
 
         expected_jar_directory = os.path.join(
-            config.application.JARS_DIRECTORY,
-            jar_name,
-            user_jar_name,
+            config.application.JARS_PATH, jar_name, user_jar_name,
         )
         # XXX: I kind of expect this to happen at least once, but this assertion
         # used to be assert_called_once_with, but apparently coverage does some

@@ -1,12 +1,17 @@
 
 import mock
+import os
+import os.path
 import testify as T
 
+import config.application
 import jar_downloader.discovery
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_jar_downloader_map
+from jar_downloader.discovery import get_user_jars
 from jar_downloader.discovery import is_jar_downloader
 from jar_downloader.jar_downloader_base import JarDownloaderBase
+from testing.utilities.mock_returns import MockReturns
 
 class TestIsJarDownloader(T.TestCase):
     """Tests the is_jar_downloader method."""
@@ -54,3 +59,40 @@ class TestGetJarDownloaderMap(T.TestCase):
             get_jar_downloaders_mock.return_value = set([Foo, Bar])
             ret = get_jar_downloader_map()
             T.assert_equal(ret, {'Foo': Foo, 'Bar': Bar})
+
+
+class TestGetUserJars(T.TestCase):
+
+    def test_get_user_jars(self):
+        with mock.patch.object(
+            os, 'listdir', MockReturns(spec=lambda s: None)
+        ) as mock_listdir:
+            mock_listdir.returns([
+                'VanillaJarDownloader',
+                'SomeOtherJarDownloader',
+            ]).then([
+                'foo',
+            ]).then([
+                'bar',
+            ])
+
+            ret = get_user_jars()
+            T.assert_equal(
+                ret,
+                {
+                    'VanillaJarDownloader': {
+                        'foo': os.path.join(
+                            config.application.JARS_PATH,
+                            'VanillaJarDownloader',
+                            'foo',
+                        ),
+                    },
+                    'SomeOtherJarDownloader': {
+                        'bar': os.path.join(
+                            config.application.JARS_PATH,
+                            'SomeOtherJarDownloader',
+                            'bar',
+                        ),
+                    },
+                }
+            )
