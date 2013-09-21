@@ -49,7 +49,7 @@ class JarDownloaderBase(object):
     def config(self):
         # TODO: catch all the exceptions here and raise one specific type
         with open(self.config_file, 'r') as config_file:
-            config_data = simplejson.load(config_file.read())
+            config_data = simplejson.load(config_file)
 
         jsonschema.validate(config_data, self.get_config_schema())
         return config_data

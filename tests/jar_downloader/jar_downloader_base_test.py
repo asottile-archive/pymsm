@@ -51,7 +51,7 @@ class TestJarDownloaderBaseConstructor(T.TestCase):
                 'r',
             )
             load_mock.assert_called_once_with(
-                open_mock.return_value.__enter__.return_value.read.return_value
+                open_mock.return_value.__enter__.return_value
             )
             validate_mock.assert_called_once_with(
                 load_mock.return_value, {'type': 'object'}
