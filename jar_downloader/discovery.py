@@ -31,7 +31,7 @@ def get_user_jars():
         }
     }
     """
-    ret = collections.defaultdict(dict)
+    user_jars = collections.defaultdict(dict)
 
     # Jars are stored in data/jars/[JarType]/[UserJarName]
     jar_type_directories = os.listdir(config.application.JARS_PATH)
@@ -39,9 +39,16 @@ def get_user_jars():
         jar_type_dir = os.path.join(config.application.JARS_PATH, jar_type)
         user_jar_names = os.listdir(jar_type_dir)
         for user_jar_name in user_jar_names:
-            ret[jar_type][user_jar_name] = os.path.join(
+            user_jars[jar_type][user_jar_name] = os.path.join(
                 jar_type_dir,
                 user_jar_name,
             )
+
+    # Let's make it a nice ordered dict
+    ret = collections.OrderedDict()
+    for key in sorted(user_jars.keys()):
+        ret[key] = collections.OrderedDict()
+        for inner_key in sorted(user_jars[key].keys()):
+            ret[key][inner_key] = user_jars[key][inner_key]
 
     return ret
