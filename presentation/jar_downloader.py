@@ -7,6 +7,7 @@ class JarDownloader(collections.namedtuple(
     ['jar_downloader_cls'],
 )):
     """A JarDownloader presenter represents a jar downloader."""
+    __slots__ = ()
 
     @property
     def name(self):
