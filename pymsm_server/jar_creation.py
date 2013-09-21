@@ -6,6 +6,7 @@ import simplejson
 
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_jar_downloader_map
+from jar_downloader.discovery import get_user_jars
 from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
 from util.flask_helpers import render_template
@@ -68,7 +69,12 @@ def available_jars():
 @require_internal
 def jar_list():
     jar_downloaders = get_jar_downloader_presenters()
-    return render_template('jar_list.htm', jar_downloaders=jar_downloaders)
+    user_jars = get_user_jars()
+    return render_template(
+        'jar_list.htm',
+        jar_downloaders=jar_downloaders,
+        user_jars=user_jars,
+    )
 
 @jar_creation.route('/new_jar/<jar_name>')
 @require_internal
@@ -99,3 +105,8 @@ def create_jar(jar_name):
 
     # TODO: redirect to Jars List with success message
     return 'Jar created successfully.'
+
+@jar_creation.route('/jar/<jar_type>/<user_jar_name>', methods=['GET'])
+@require_internal
+def jar_home(jar_type, user_jar_name):
+    return 'foo'
