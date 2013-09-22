@@ -2,6 +2,7 @@
 import flask
 import os.path
 
+from pymsm_server.jar import jar
 from pymsm_server.jar_creation import jar_creation
 from util.flask_helpers import render_template
 
@@ -12,6 +13,7 @@ EXTENSIONS_TO_MIMETYPES = {
 
 app = flask.Flask(__name__)
 app.register_blueprint(jar_creation)
+app.register_blueprint(jar)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -49,5 +51,3 @@ def catch_all(path):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-    print 'after'
