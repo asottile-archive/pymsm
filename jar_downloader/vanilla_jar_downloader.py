@@ -81,11 +81,12 @@ class VanillaJarDownloader(JarDownloaderBase):
         """Lists all of the files in the directory and returns Jar objects of
         them.
         """
-        return [
-            self._to_jar(filename)
-            for filename in os.listdir(self.jar_directory)
+        filenames = [
+            filename for filename in os.listdir(self.jar_directory)
             if fnmatch.fnmatch(filename, JAR_MATCH)
         ]
+        sorted_filenames = natural_sort(filenames)
+        return [self._to_jar(filename) for filename in sorted_filenames]
 
     def _try_to_get_latest_version(self):
         """Attempts to get the latest version from the LATEST_FILE.

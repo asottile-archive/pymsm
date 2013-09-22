@@ -123,19 +123,37 @@ class TestVanillaJarDownloader(T.TestCase):
                 'foo.jar',
                 'foo',
                 # Some actual files that we downloaded
-                JAR_FILENAME % 'herp',
-                JAR_FILENAME % 'derp',
                 JAR_FILENAME % '1.6.2',
+                JAR_FILENAME % 'derp',
+                JAR_FILENAME % 'herp',
             ]
             instance = VanillaJarDownloader(self.directory)
             downloaded_versions = instance.downloaded_versions
             T.assert_equal(
                 downloaded_versions,
                 [
-                    Jar(JAR_FILENAME % 'herp', 'herp'),
-                    Jar(JAR_FILENAME % 'derp', 'derp'),
                     Jar(JAR_FILENAME % '1.6.2', '1.6.2'),
+                    Jar(JAR_FILENAME % 'derp', 'derp'),
+                    Jar(JAR_FILENAME % 'herp', 'herp'),
                 ]
+            )
+
+    def test_downloaded_versions_sorts(self):
+        with mock.patch.object(os, 'listdir', autospec=True) as listdir_mock:
+            listdir_mock.return_value = [
+                JAR_FILENAME % '1.6.2',
+                JAR_FILENAME % '1.4.5',
+                JAR_FILENAME % '1.6.4',
+            ]
+            instance = VanillaJarDownloader(self.directory)
+            downloaded_versions = instance.downloaded_versions
+            T.assert_equal(
+                downloaded_versions,
+                [
+                    Jar(JAR_FILENAME % '1.4.5', '1.4.5'),
+                    Jar(JAR_FILENAME % '1.6.2', '1.6.2'),
+                    Jar(JAR_FILENAME % '1.6.4', '1.6.4'),
+                ],
             )
 
     def test_try_to_get_latest_version_file_does_not_exist(self):
