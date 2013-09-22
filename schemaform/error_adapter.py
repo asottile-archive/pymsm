@@ -14,6 +14,7 @@ class ErrorAdapter(collections.namedtuple(
     """An ErrorAdapter adapts a ValidationError into a form that is useful for
     generating an errors dict in schemaform.form.Form
     """
+    __slots__ = ()
 
     @classmethod
     def from_validation_error(cls, validation_error):

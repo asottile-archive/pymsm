@@ -12,6 +12,7 @@ class RadioInput(collections.namedtuple(
     'RadioInput', ['name', 'value', 'label', 'checked']
 )):
     """Represents a <input type="radio" ...><label for...>"""
+    __slots__ = ()
 
     @property
     def id(self):
