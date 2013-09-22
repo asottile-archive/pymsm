@@ -1,0 +1,35 @@
+{% extends "base.htm" %}
+
+{% block title %}{{ user_jar.jar_type }} | {{user_jar.name }}{% endblock %}
+
+{% block body %}
+  <h2>{{ user_jar.jar_type }} | {{ user_jar.name }}</h2>
+
+  <h4>Jar Directory: {{ user_jar.jar_directory }}</h4>
+
+  <h4>Latest Installed Version: {{ user_jar.latest_downloaded_version }}</h4>
+
+  <h3>Downloaded Jar Versions</h3>
+  <ul>
+    {% for jar_version in user_jar.downloaded_versions %}
+      <li>{{ jar_version }}</li>
+    {% else %}
+      <li>No Jars Downloaded!</li>
+    {% endfor %}
+  </ul>
+
+  <h3>Available Jar Versions<h3>
+  <ul>
+    {% for jar_version in user_jar.available_versions %}
+      <li>
+        {# TODO: link to download #}
+        {{ jar_version }}
+      </li>
+    {% else %}
+      <li>No Available Versions</li>
+    {% endfor %}
+  </ul>
+
+  {# TODO: link to update jar to latest version #}
+
+{% endblock %}

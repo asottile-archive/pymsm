@@ -11,6 +11,7 @@ from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
 from util.flask_helpers import render_template
 from presentation.jar_downloader import JarDownloader
+from presentation.user_jar import UserJar
 from schemaform.form import Form
 from schemaform.helpers import el
 from schemaform.single_input_property import SingleInputProperty
@@ -109,4 +110,14 @@ def create_jar(jar_name):
 @jar_creation.route('/jar/<jar_type>/<user_jar_name>', methods=['GET'])
 @require_internal
 def jar_home(jar_type, user_jar_name):
-    return 'foo'
+    jar_cls = get_jar_downloader_map()[jar_type]
+    jar_path = get_user_jars()[jar_type][user_jar_name]
+
+    instance = jar_cls(jar_path)
+    user_jar_presenter = UserJar.from_user_jar(
+        instance,
+        jar_type,
+        user_jar_name,
+    )
+
+    return render_template('jar_home.htm', user_jar=user_jar_presenter)
