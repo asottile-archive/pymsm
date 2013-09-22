@@ -12,12 +12,15 @@ jar = flask.Blueprint(
     'jar', __name__, template_folder='templates/jar'
 )
 
+def get_jar_instance(jar_type, user_jar_name):
+    jar_cls = get_jar_downloader_map()[jar_type]
+    jar_path = get_user_jars()[jar_type][user_jar_name]
+    return jar_cls(jar_path)
+
 @jar.route('/jar/<jar_type>/<user_jar_name>', methods=['GET'])
 @require_internal
 def jar_home(jar_type, user_jar_name):
-    jar_cls = get_jar_downloader_map()[jar_type]
-    jar_path = get_user_jars()[jar_type][user_jar_name]
-    instance = jar_cls(jar_path)
+    instance = get_jar_instance(jar_type, user_jar_name)
 
     user_jar_presenter = UserJar.from_user_jar(
         instance,
@@ -29,10 +32,8 @@ def jar_home(jar_type, user_jar_name):
 
 @jar.route('/jar/<jar_type>/<user_jar_name>/update', methods=['POST'])
 @require_internal
-def jar_update(jar_type, user_jar_name):
-    jar_cls = get_jar_downloader_map()[jar_type]
-    jar_path = get_user_jars()[jar_type][user_jar_name]
-    instance = jar_cls(jar_path)
+def update(jar_type, user_jar_name):
+    instance = get_jar_instance(jar_type, user_jar_name)
 
     try:
         instance.update()
@@ -42,5 +43,9 @@ def jar_update(jar_type, user_jar_name):
 
 @jar.route('/jar/<jar_type>/<user_jar_name>/download', methods=['POST'])
 @require_internal
-def jar_download(jar_type, user_jar_name):
-    pass
+def download(jar_type, user_jar_name):
+    version = flask.request.form['version']
+
+    instance = get_jar_instance(jar_type, user_jar_name)
+    instance.download_specific_version(version)
+    return simplejson.dumps({'success': True})

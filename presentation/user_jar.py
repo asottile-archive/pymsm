@@ -1,5 +1,6 @@
 
 import collections
+import flask
 
 class UserJar(collections.namedtuple(
     'UserJar',
@@ -13,6 +14,28 @@ class UserJar(collections.namedtuple(
     ],
 )):
     __slots__ = ()
+
+    @property
+    def update_url(self):
+        return flask.url_for(
+            'jar.update',
+            jar_type=self.jar_type,
+            user_jar_name=self.name,
+        )
+
+    @property
+    def download_url(self):
+        return flask.url_for(
+            'jar.download',
+            jar_type=self.jar_type,
+            user_jar_name=self.name,
+        )
+
+    def has_version(self, version):
+        return any(
+            jar.short_version == version
+            for jar in self.downloaded_versions
+        )
 
     @classmethod
     def from_user_jar(cls, instance, jar_type, name):

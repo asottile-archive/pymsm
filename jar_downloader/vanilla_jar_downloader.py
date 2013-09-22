@@ -150,12 +150,13 @@ class VanillaJarDownloader(JarDownloaderBase):
             raise AssertionError('Not a valid version number.')
 
         jar_filename = os.path.join(self.jar_directory, JAR_FILENAME % version)
+        # Do this before opening the file in case of an error (so we don't
+        # create an empty file)
+        jar_contents = urllib2.urlopen(
+            DOWNLOAD_PATH.format(version=version),
+        ).read()
         with open(jar_filename, 'wb') as jar_file:
-            jar_file.write(
-                urllib2.urlopen(
-                    DOWNLOAD_PATH.format(version=version)
-                ).read()
-            )
+            jar_file.write(jar_contents)
 
     def _get_latest_version(self):
         versions_json = get_versions_json()
