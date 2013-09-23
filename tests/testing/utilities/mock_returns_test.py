@@ -48,3 +48,8 @@ class TestMockReturns(T.TestCase):
         mock()
         with T.assert_raises(IndexError):
             mock()
+
+    def test_return_values(self):
+        mock = MockReturns()
+        mock.returns('foo').then('bar').then('baz')
+        T.assert_equal(mock.return_values, ('foo', 'bar', 'baz'))

@@ -2,6 +2,7 @@
 import flask
 import os.path
 
+import config.application
 from pymsm_server.jar import jar
 from pymsm_server.jar_creation import jar_creation
 from util.flask_helpers import render_template
@@ -34,16 +35,16 @@ def catch_all(path):
 
     # Try and serve that file
     try:
-        # Make the paths relative to where this file is
+        # Make the paths relative to where the application root is
         path = os.path.join(
-            os.path.split(os.path.abspath(__file__))[0],
+            os.path.join(config.application.APP_ROOT, 'assets'),
             path
         )
 
-        with open(path, 'r') as f:
+        with open(path, 'r') as asset_file:
             extension = os.path.splitext(path)[1]
             return flask.Response(
-                f.read(),
+                asset_file.read(),
                 mimetype=EXTENSIONS_TO_MIMETYPES.get(extension, 'text/html')
             )
     except IOError:
