@@ -4,12 +4,12 @@ import os
 import os.path
 import testify as T
 
-import config.application
 import jar_downloader.discovery
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import get_user_jars
 from jar_downloader.discovery import is_jar_downloader
+from jar_downloader.helpers import get_jar_directory
 from jar_downloader.jar_downloader_base import JarDownloaderBase
 from testing.utilities.mock_returns import MockReturns
 
@@ -81,15 +81,13 @@ class TestGetUserJars(T.TestCase):
                 ret,
                 {
                     'VanillaJarDownloader': {
-                        'foo': os.path.join(
-                            config.application.JARS_PATH,
+                        'foo': get_jar_directory(
                             'VanillaJarDownloader',
                             'foo',
                         ),
                     },
                     'SomeOtherJarDownloader': {
-                        'bar': os.path.join(
-                            config.application.JARS_PATH,
+                        'bar': get_jar_directory(
                             'SomeOtherJarDownloader',
                             'bar',
                         ),

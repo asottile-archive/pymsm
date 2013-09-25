@@ -13,8 +13,18 @@ import testify as T
 import config.application
 from jar_downloader.helpers import CONFIG_FILE
 from jar_downloader.helpers import create_jar_directory
+from jar_downloader.helpers import get_jar_directory
 from jar_downloader.jar_downloader_base import JarDownloaderBase
 from testing.utilities.fake_file import FakeFile
+
+class TestGetJarDirectory(T.TestCase):
+
+    def test_get_jar_directory(self):
+        jar_directory = get_jar_directory('foo', 'bar')
+        T.assert_equal(
+            jar_directory,
+            os.path.join(config.application.JARS_PATH, 'foo', 'bar'),
+        )
 
 class TestCreateJarDirectory(T.TestCase):
 
@@ -48,9 +58,7 @@ class TestCreateJarDirectory(T.TestCase):
         jar_config = {'foo': 'bar'}
         create_jar_directory(jar_name, user_jar_name, jar_config)
 
-        expected_jar_directory = os.path.join(
-            config.application.JARS_PATH, jar_name, user_jar_name,
-        )
+        expected_jar_directory = get_jar_directory(jar_name, user_jar_name)
         # XXX: I kind of expect this to happen at least once, but this assertion
         # used to be assert_called_once_with, but apparently coverage does some
         # crazy shit when running this.

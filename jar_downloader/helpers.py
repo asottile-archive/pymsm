@@ -7,20 +7,23 @@ import config.application
 
 CONFIG_FILE = 'config.json'
 
-def create_jar_directory(jar_name, user_jar_name, jar_config):
+def get_jar_directory(jar_type, user_jar_name):
+    return os.path.join(
+        config.application.JARS_PATH, jar_type, user_jar_name,
+    )
+
+def create_jar_directory(jar_type, user_jar_name, jar_config):
     """Sets up the jar directory for a jar.
 
     A jar is stored in JARS_PATH/JarClsName/UserJarName/
 
     Args:
-        jar_name - The type of jar to create
+        jar_type - The type of jar to create
         user_jar_name - Name given by the user for the jar (to allow multiple
             jars to be created with the same class name)
         jar_config - Configuration of the jar
     """
-    jar_folder_path = os.path.join(
-        config.application.JARS_PATH, jar_name, user_jar_name,
-    )
+    jar_folder_path = get_jar_directory(jar_type, user_jar_name)
 
     # Make sure that the jar directory doesn't already exist
     if os.path.exists(jar_folder_path):

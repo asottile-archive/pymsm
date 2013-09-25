@@ -5,8 +5,6 @@ import os
 import os.path
 import sys
 
-import config.application
-
 def get_module_name(root, filename):
     """Returns the module name for a python file.
 
@@ -19,7 +17,10 @@ def get_module_name(root, filename):
 
     filename = filename[:-3]
     joined_path = os.path.join(root, filename)
-    relpath = os.path.relpath(joined_path, config.application.APP_ROOT)
+    relpath = os.path.relpath(
+        joined_path,
+        os.path.join(os.path.dirname(__file__), '../'),
+    )
     # XXX: should really use pathsep here
     return relpath.replace('/', '.')
 
