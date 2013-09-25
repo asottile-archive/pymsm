@@ -15,10 +15,18 @@ class FlaskTestCase(T.TestCase):
     def setup_flask_app_instance(self):
         """Sets up a test client instance for use in testing."""
         # Patch in our own test client class
-        with mock.patch.object(
-            self.FLASK_APPLICATION,
-            'test_client_class',
-            TestingClient,
+        with contextlib.nested(
+            mock.patch.object(
+                self.FLASK_APPLICATION,
+                'test_client_class',
+                TestingClient,
+            ),
+            # Make the app always debug so it throws exceptions
+            mock.patch.object(
+                type(self.FLASK_APPLICATION),
+                'debug',
+                mock.PropertyMock(return_value=True),
+            ),
         ):
             with contextlib.nested(
                 self.FLASK_APPLICATION.test_request_context(),
