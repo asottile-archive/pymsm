@@ -35,11 +35,8 @@ def jar_home(jar_type, user_jar_name):
 def update(jar_type, user_jar_name):
     instance = get_jar_instance(jar_type, user_jar_name)
 
-    try:
-        instance.update()
-        return simplejson.dumps({'succes': True})
-    except Exception:
-        return simplejson.dumps({'success': False})
+    instance.update()
+    return simplejson.dumps({'success': True})
 
 @jar.route('/jar/<jar_type>/<user_jar_name>/download', methods=['POST'])
 @require_internal
