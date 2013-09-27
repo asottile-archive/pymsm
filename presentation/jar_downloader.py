@@ -15,4 +15,4 @@ class JarDownloader(collections.namedtuple(
 
     @property
     def url(self):
-        return flask.url_for('jar_creation.new_jar', jar_name=self.name)
+        return flask.url_for('jar_creation.new_jar', jar_type=self.name)

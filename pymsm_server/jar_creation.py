@@ -30,21 +30,21 @@ def get_jar_downloader_presenters():
         key=lambda jar_downloader: jar_downloader.name
     )
 
-def get_jar_create_form(jar_name):
+def get_jar_create_form(jar_type):
     """Returns a form for creating a jar given its name.  The returned form
     has (in addition to the form elements retrieved from the jar itself) a
     hidden element denoting the name of the jar.  It also has an input for the
     user to add a name to jar and a submit button.
     """
     # TODO: validate the jar name and redirect back if nonsense, for now error
-    jar_presenter = JarDownloader(get_jar_downloader_map()[jar_name])
+    jar_presenter = JarDownloader(get_jar_downloader_map()[jar_type])
 
     # Need to add a hidden field for the jar name and a text entry for
     # what the name they are giving it
     form_pq = Form(
         jar_presenter.jar_downloader_cls.get_config_schema(),
         method='POST',
-        action=flask.url_for('jar_creation.create_jar', jar_name=jar_name),
+        action=flask.url_for('jar_creation.create_jar', jar_type=jar_type),
     ).__pq__()
     user_jar_name_input = SingleInputProperty(
         '',
@@ -69,16 +69,16 @@ def jar_list():
         user_jars=user_jars,
     )
 
-@jar_creation.route('/new_jar/<jar_name>', methods=['GET'])
+@jar_creation.route('/new_jar/<jar_type>', methods=['GET'])
 @require_internal
-def new_jar(jar_name):
-    jar_form_markup = get_jar_create_form(jar_name)
+def new_jar(jar_type):
+    jar_form_markup = get_jar_create_form(jar_type)
     return render_template('new_jar.htm', jar_form_markup=jar_form_markup)
 
-@jar_creation.route('/create_jar/<jar_name>', methods=['POST'])
+@jar_creation.route('/create_jar/<jar_type>', methods=['POST'])
 @require_internal
-def create_jar(jar_name):
-    jar_downloader_cls = get_jar_downloader_map()[jar_name]
+def create_jar(jar_type):
+    jar_downloader_cls = get_jar_downloader_map()[jar_type]
     form = Form(jar_downloader_cls.get_config_schema())
     values, errors = form.load_from_form(flask.request.form)
 
@@ -94,7 +94,7 @@ def create_jar(jar_name):
     # TODO: there is a ValueError to catch here for already created jar
     # directory.  Should really make this a more specific exception and also
     # handle it appropriately here.
-    create_jar_directory(jar_name, user_jar_name, values)
+    create_jar_directory(jar_type, user_jar_name, values)
 
     # TODO: redirect to Jars List with success message
     return 'Jar created successfully.'

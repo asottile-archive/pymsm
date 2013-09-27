@@ -9,16 +9,16 @@
       <li>
         {{ jar_type }}:
         <ul>
-          {% for jar_name in jars_of_type.keys() %}
+          {% for user_jar_name in jars_of_type.keys() %}
             <li>
               <a href="{{
                 url_for(
                   'jar.jar_home',
                   jar_type=jar_type,
-                  user_jar_name=jar_name,
+                  user_jar_name=user_jar_name,
                 )
               }}">
-                {{ jar_name }}
+                {{ user_jar_name }}
               </a>
             </li>
           {% endfor %}

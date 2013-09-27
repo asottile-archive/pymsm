@@ -72,7 +72,7 @@ class TestGetJarCreateForm(T.TestCase):
         T.assert_length(ret_pq.find('input[name=user_jar_name]'), 1)
 
 
-class TestJarList(TestJarBase):
+class TestJarCreation(TestJarBase):
 
     def test_jar_list(self):
         resp = self.client.get(flask.url_for('jar_creation.jar_list'))
@@ -81,3 +81,14 @@ class TestJarList(TestJarBase):
         T.assert_length(resp.pq.find('h2'), 2)
         # 2 is for the type and user jar, then one for each jar downloader
         T.assert_length(resp.pq.find('li'), 2 + len(get_jar_downloaders()))
+
+    def test_new_jar(self):
+        resp = self.client.get(flask.url_for(
+            'jar_creation.new_jar',
+            jar_type=self.jar_type,
+        ))
+        form = resp.pq.find('form')
+        T.assert_length(form, 1)
+        # Make sure the form has a submit button and an input for user jar name
+        T.assert_length(form.find('[name=user_jar_name]'), 1)
+        T.assert_length(form.find('input[type=submit]'), 1)
