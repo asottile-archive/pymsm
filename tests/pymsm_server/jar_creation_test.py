@@ -2,14 +2,17 @@
 import contextlib
 import flask
 import mock
+import os.path
 import pyquery
 import testify as T
 
 from jar_downloader.discovery import get_jar_downloaders
+from jar_downloader.helpers import get_jar_directory
 from presentation.jar_downloader import JarDownloader
 import pymsm_server.jar_creation
 from pymsm_server.jar_creation import get_jar_create_form
 from pymsm_server.jar_creation import get_jar_downloader_presenters
+from testing.assertions.response import assert_no_response_errors
 from testing.data.generators import get_fake_jar_downloader_cls
 from tests.pymsm_server.jar_test import TestJarBase
 
@@ -76,6 +79,7 @@ class TestJarCreation(TestJarBase):
 
     def test_jar_list(self):
         resp = self.client.get(flask.url_for('jar_creation.jar_list'))
+        assert_no_response_errors(resp)
 
         # There should be 2 h2s, one for user jars, one for jars
         T.assert_length(resp.pq.find('h2'), 2)
@@ -87,8 +91,35 @@ class TestJarCreation(TestJarBase):
             'jar_creation.new_jar',
             jar_type=self.jar_type,
         ))
+        assert_no_response_errors(resp)
+
+        # Make sure the form has a submit button and an input for user jar name
         form = resp.pq.find('form')
         T.assert_length(form, 1)
-        # Make sure the form has a submit button and an input for user jar name
         T.assert_length(form.find('[name=user_jar_name]'), 1)
         T.assert_length(form.find('input[type=submit]'), 1)
+
+class TestCreateJar(TestJarBase):
+
+    new_user_jar_name = 'HerpDerp'
+
+    def test_create_jar(self):
+        # Not incredibly worried about teardown because we delete the
+        # sandboxed data directory anyways
+        resp = self.client.post(
+            flask.url_for('jar_creation.create_jar', jar_type=self.jar_type),
+            data={
+                'user_jar_name': self.new_user_jar_name,
+                'jar_type': 'release',
+            }
+        )
+        assert_no_response_errors(resp)
+
+        # TODO: this response should be more meaningful but for now it is boring
+
+        T.assert_equal(
+            True,
+            os.path.exists(
+                get_jar_directory(self.jar_type, self.new_user_jar_name),
+            ),
+        )
