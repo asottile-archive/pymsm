@@ -2,7 +2,6 @@
 import flask
 import markupsafe
 import re
-import simplejson
 
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.discovery import get_jar_downloader_map
@@ -58,12 +57,6 @@ def get_jar_create_form(jar_name):
 
     return jar_form_markup
 
-@jar_creation.route('/available_jars', methods=['GET'])
-@require_internal
-def available_jars():
-    jar_downloaders = get_jar_downloader_presenters()
-    jar_downloader_names = [jar.name for jar in jar_downloaders]
-    return simplejson.dumps(jar_downloader_names)
 
 @jar_creation.route('/jar_list', methods=['GET'])
 @require_internal
@@ -76,7 +69,7 @@ def jar_list():
         user_jars=user_jars,
     )
 
-@jar_creation.route('/new_jar/<jar_name>')
+@jar_creation.route('/new_jar/<jar_name>', methods=['GET'])
 @require_internal
 def new_jar(jar_name):
     jar_form_markup = get_jar_create_form(jar_name)

@@ -5,11 +5,13 @@ import mock
 import pyquery
 import testify as T
 
+from jar_downloader.discovery import get_jar_downloaders
 from presentation.jar_downloader import JarDownloader
 import pymsm_server.jar_creation
 from pymsm_server.jar_creation import get_jar_create_form
 from pymsm_server.jar_creation import get_jar_downloader_presenters
 from testing.data.generators import get_fake_jar_downloader_cls
+from tests.pymsm_server.jar_test import TestJarBase
 
 class TestGetJarDownloaderPresenters(T.TestCase):
     def test_get_jar_downloader_presenters(self):
@@ -68,3 +70,14 @@ class TestGetJarCreateForm(T.TestCase):
         ret = get_jar_create_form('B')
         ret_pq = pyquery.PyQuery(ret)
         T.assert_length(ret_pq.find('input[name=user_jar_name]'), 1)
+
+
+class TestJarList(TestJarBase):
+
+    def test_jar_list(self):
+        resp = self.client.get(flask.url_for('jar_creation.jar_list'))
+
+        # There should be 2 h2s, one for user jars, one for jars
+        T.assert_length(resp.pq.find('h2'), 2)
+        # 2 is for the type and user jar, then one for each jar downloader
+        T.assert_length(resp.pq.find('li'), 2 + len(get_jar_downloaders()))
