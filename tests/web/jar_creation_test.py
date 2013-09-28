@@ -9,12 +9,12 @@ import testify as T
 from jar_downloader.discovery import get_jar_downloaders
 from jar_downloader.helpers import get_jar_directory
 from presentation.jar_downloader import JarDownloader
-import pymsm_server.jar_creation
-from pymsm_server.jar_creation import get_jar_create_form
-from pymsm_server.jar_creation import get_jar_downloader_presenters
 from testing.assertions.response import assert_no_response_errors
 from testing.data.generators import get_fake_jar_downloader_cls
-from tests.pymsm_server.jar_test import TestJarBase
+from tests.web.jar_test import TestJarBase
+import web.jar_creation
+from web.jar_creation import get_jar_create_form
+from web.jar_creation import get_jar_downloader_presenters
 
 class TestGetJarDownloaderPresenters(T.TestCase):
     def test_get_jar_downloader_presenters(self):
@@ -25,7 +25,7 @@ class TestGetJarDownloaderPresenters(T.TestCase):
         ]
 
         with mock.patch.object(
-            pymsm_server.jar_creation,
+            web.jar_creation,
             'get_jar_downloaders',
             autospec=True,
         ) as get_jar_downloaders_mock:
@@ -46,7 +46,7 @@ class TestGetJarCreateForm(T.TestCase):
     def patch_out_jar_downloader_map(self):
         with contextlib.nested(
             mock.patch.object(
-                pymsm_server.jar_creation,
+                web.jar_creation,
                 'get_jar_downloader_map',
                 autospec=True,
             ),

@@ -7,8 +7,8 @@ import tempfile
 import testify as T
 
 import config.application
-from pymsm_server.start import app
 from testing.base_classes.flask_test_case import FlaskTestCase
+from web.start import app
 
 @T.suite('integration')
 class PymsmServerTestCase(FlaskTestCase):

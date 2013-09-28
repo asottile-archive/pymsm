@@ -4,7 +4,7 @@ import testify as T
 
 from jar_downloader.jar_downloader_base import Jar
 from presentation.user_jar import UserJar
-from pymsm_server.start import app
+from web.start import app
 
 class TestUserJar(T.TestCase):
 

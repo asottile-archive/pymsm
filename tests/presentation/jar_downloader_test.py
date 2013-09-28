@@ -2,7 +2,7 @@
 import testify as T
 
 from presentation.jar_downloader import JarDownloader
-from pymsm_server.start import app
+from web.start import app
 
 class TestJarDownloader(T.TestCase):
 

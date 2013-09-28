@@ -3,9 +3,9 @@ import flask
 import os.path
 
 import config.application
-from pymsm_server.jar import jar
-from pymsm_server.jar_creation import jar_creation
 from util.flask_helpers import render_template
+from web.jar import jar
+from web.jar_creation import jar_creation
 
 EXTENSIONS_TO_MIMETYPES = {
     '.js': 'application/javascript',
