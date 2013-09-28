@@ -4,7 +4,7 @@ import testify as T
 
 from jar_downloader.jar_downloader_base import Jar
 from presentation.user_jar import UserJar
-from web.start import app
+from web.app import app
 
 class TestUserJar(T.TestCase):
 

@@ -2,7 +2,7 @@
 import testify as T
 
 from presentation.jar_downloader import JarDownloader
-from web.start import app
+from web.app import app
 
 class TestJarDownloader(T.TestCase):
 

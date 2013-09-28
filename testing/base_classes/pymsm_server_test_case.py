@@ -8,7 +8,7 @@ import testify as T
 
 import config.application
 from testing.base_classes.flask_test_case import FlaskTestCase
-from web.start import app
+from web.app import app
 
 @T.suite('integration')
 class PymsmServerTestCase(FlaskTestCase):
