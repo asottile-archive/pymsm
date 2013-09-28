@@ -9,7 +9,7 @@ from util.flask_helpers import render_template
 from presentation.user_jar import UserJar
 
 jar = flask.Blueprint(
-    'jar', __name__, template_folder='templates/jar'
+    'jar', __name__, template_folder='../templates/jar'
 )
 
 def get_jar_instance(jar_type, user_jar_name):

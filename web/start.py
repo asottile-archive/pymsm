@@ -4,8 +4,8 @@ import os.path
 
 import config.application
 from util.flask_helpers import render_template
-from web.jar import jar
-from web.jar_creation import jar_creation
+from web.servlets.jar import jar
+from web.servlets.jar_creation import jar_creation
 
 EXTENSIONS_TO_MIMETYPES = {
     '.js': 'application/javascript',

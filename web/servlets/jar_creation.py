@@ -15,7 +15,7 @@ from schemaform.helpers import el
 from schemaform.single_input_property import SingleInputProperty
 
 jar_creation = flask.Blueprint(
-    'jar_creation', __name__, template_folder='templates/jar_creation'
+    'jar_creation', __name__, template_folder='../templates/jar_creation'
 )
 
 USER_JAR_NAME_REGEX = re.compile('^[a-zA-Z-_]+$')
