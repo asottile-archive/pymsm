@@ -37,7 +37,7 @@ def catch_all(path):
     try:
         # Make the paths relative to where the application root is
         path = os.path.join(
-            os.path.join(config.application.APP_ROOT, 'assets'),
+            os.path.join(config.application.APP_ROOT, 'web/assets'),
             path
         )
 
