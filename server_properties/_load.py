@@ -33,6 +33,22 @@ LINE_CONTINUATION_RE = re.compile(
     re.VERBOSE,
 )
 
+# Whitespace charactesr:
+# From java.util.Properties:
+# ... this format considers the characters space (' ', '\u0020'),
+# tab ('\t', '\u0009'), and form feed ('\f', '\u000C') to be white space.
+# From java.util.Properties:
+# ... the first unescaped '=', ':', or white space character other than a line
+# terminator. All of these key termination characters may be included in the
+# key by escaping them with a preceding backslash character
+CUSTOM_ESCAPE_SEQUENCES = (
+    (r'\\=', '='),
+    (r'\\:', ':'),
+    (r'\\ ', ' '),
+    ('\\\\\t', '\t'),
+    ('\\\\\f', '\f'),
+)
+
 def _blank_line_stripping_helper(iterable):
     """Skips blank lines as described in java.util.Properties:
         A natural line that contains only white space characters is considered
