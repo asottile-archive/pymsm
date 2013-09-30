@@ -32,6 +32,19 @@ class TestLineContinuationRe(BooleanMatchReTestBase):
         ('foo' + backslash * 3, True),
     )
 
+class TestBlankLineStrippingHelper(T.TestCase):
+
+    def test_blank_line_stripping_helper(test):
+        lines = [
+            'foo',
+            '',
+            'bar',
+            '\t',
+            'baz',
+        ]
+        ret = list(server_properties._load._blank_line_stripping_helper(lines))
+        T.assert_equal(ret, ['foo', 'bar', 'baz'])
+
 class TestCommentStrippingHelper(T.TestCase):
 
     def test_comment_stripping_helper(self):

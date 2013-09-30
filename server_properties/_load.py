@@ -33,6 +33,18 @@ LINE_CONTINUATION_RE = re.compile(
     re.VERBOSE,
 )
 
+def _blank_line_stripping_helper(iterable):
+    """Skips blank lines as described in java.util.Properties:
+        A natural line that contains only white space characters is considered
+        blank and is ignored.
+
+    Args:
+        iterable - An iterable of lines
+    """
+    for line in iterable:
+        if line.strip():
+            yield line
+
 def _comment_stripping_helper(iterable):
     """Generator to strip comments from a properties file.
 
