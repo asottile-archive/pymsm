@@ -1,0 +1,2 @@
+
+class InvalidPropertiesFileError(ValueError): pass
