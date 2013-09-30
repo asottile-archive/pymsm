@@ -42,6 +42,11 @@ TESTS = [
         True, 'testtestnames',
     ),
     Test(
+        "%s | xargs egrep 'split\(.\\\\n.\)'" % PY_FILES,
+        'Py    - Use s.splitlines over s.split',
+        True, 'testsplitlines',
+    ),
+    Test(
         "%s | xargs grep -H -n -P '\t'" % ALL_FILES,
         "All   - No tabs",
         True, 'testtabs',
