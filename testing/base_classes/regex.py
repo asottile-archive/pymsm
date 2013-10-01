@@ -54,7 +54,12 @@ class ReplaceReTestBase(T.TestCase):
                     'Failed test of regex {0}.\n'
                     'Replace String: {1}\n'
                     'Test: {2}\n'
-                    'Expected outcome: {3}\n'.format(
-                        self.regex.pattern, self.replacement, test, expected
+                    'Expected outcome: {3}\n'
+                    'Actual outcome: {4}\n'.format(
+                        self.regex.pattern,
+                        self.replacement,
+                        test,
+                        expected,
+                        replaced,
                     )
                 )

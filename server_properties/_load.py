@@ -60,6 +60,17 @@ SPECIALLY_ESCAPED_CHARACTERS = set(
     COMMENT + WHITESPACE + ASSIGNMENT
 )
 
+UNESCAPE_RE_SKELETON = r'''
+    (
+        # Beginning of string or a non-backslash character
+        (?:\A|[^\\])
+        # A chunk of even regexes
+        (?:\\\\)*
+    )
+    # Our replace character is 0
+    \\{0}
+'''
+
 class KeySplitter(object):
     """A KeySplitter is for splitting up lines for loading properties."""
 

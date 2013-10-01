@@ -1,9 +1,11 @@
 
+import re
 import testify as T
 
 import server_properties._load
 from server_properties.exceptions import InvalidPropertiesFileError
 from testing.base_classes.regex import BooleanMatchReTestBase
+from testing.base_classes.regex import ReplaceReTestBase
 
 class TestCommentRe(BooleanMatchReTestBase):
 
@@ -30,6 +32,24 @@ class TestLineContinuationRe(BooleanMatchReTestBase):
         ('foo' + backslash * 1, True),
         ('foo' + backslash * 2, False),
         ('foo' + backslash * 3, True),
+    )
+
+class TestUnescapeReSkeleton(ReplaceReTestBase):
+    regex = re.compile(
+        server_properties._load.UNESCAPE_RE_SKELETON.format('@'),
+        re.VERBOSE,
+    )
+    replacement = r'\1~'
+
+    expected = (
+        (r'\@', '~'),
+        (r'\\\@', r'\\~'),
+        # Sadface, I can't get this one to replace correctly, I'll have to
+        # replace in a loop instead it appears
+        # (r'\@\@', '~~'),
+        # No replace here!
+        (r'\\\\@', r'\\\\@'),
+        ('@', '@'),
     )
 
 class TestKeySplitter(T.TestCase):
