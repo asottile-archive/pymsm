@@ -32,6 +32,58 @@ class TestLineContinuationRe(BooleanMatchReTestBase):
         ('foo' + backslash * 3, True),
     )
 
+class TestKeySplitter(T.TestCase):
+
+    # Tuple of tuples of (input, output_key, output_value)
+    expected = (
+        ('foo=bar', 'foo', 'bar'),
+        ('foo:bar', 'foo', 'bar'),
+        ('foo bar', 'foo', 'bar'),
+
+        ('foo\ bar=baz', 'foo\ bar', 'baz'),
+        ('foo\=bar=baz', 'foo\=bar', 'baz'),
+        ('foo\:bar=baz', 'foo\:bar', 'baz'),
+
+        # Some examples from minecraft's server.properties
+        ('generator-settings=', 'generator-settings', ''),
+        ('server-port=25565', 'server-port', '25565'),
+        ('motd=A Minecraft Server', 'motd', 'A Minecraft Server'),
+
+        # From java.util.Properties:
+        ('Truth = Beauty', 'Truth', 'Beauty'),
+        ('        Truth:Beauty', 'Truth', 'Beauty'),
+        ('Truth             :Beauty', 'Truth', 'Beauty'),
+
+        # This next one also comes from java.util.Properties but I'll simplify
+        # it to how we would expect to process it
+        (
+            list(server_properties._load._line_continuation_helper([
+                'fruits                    apple, banana, pear, \\',
+                '                          cantaloupe, watermelon, \\',
+                '                          kiwi, mango',
+            ]))[0],
+            'fruits', 'apple, banana, pear, cantaloupe, watermelon, kiwi, mango'
+        ),
+
+        # This is one of the examples they use for a key with no value
+        ('cheeses', 'cheeses', ''),
+    )
+
+    def test_expected(self):
+        for input, expected_key, expected_value in self.expected:
+            key, value = server_properties._load.KeySplitter(input).split()
+            if key != expected_key or value != expected_value:
+                raise AssertionError(
+                    'KeySplitter did not yield the expected key/value\n'
+                    'Input: {0}\n'
+                    'Key (Expected): {1}\n'
+                    'Key (Actually): {2}\n'
+                    'Value (Expected): {3}\n'
+                    'Value (Actually): {4}\n'.format(
+                        input, expected_key, key, expected_value, value
+                    )
+                )
+
 class TestBlankLineStrippingHelper(T.TestCase):
 
     def test_blank_line_stripping_helper(test):
