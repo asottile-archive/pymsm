@@ -49,8 +49,12 @@ END_OF_ASSIGNMENT = set(
 # From java.util.Properties:
 # The key and element characters #, !, =, and : are written with a preceding
 # backslash to ensure that they are properly loaded.
-SPECIALLY_ESCAPED_CHARACTERS = set(
+KEY_ESCAPED_CHARACTERS = set(
     COMMENT + WHITESPACE + ASSIGNMENT
+)
+
+VALUE_ESCAPED_CHARACTERS = set(
+    COMMENT + ASSIGNMENT
 )
 
 UNESCAPE_RE_SKELETON = r'''
@@ -61,7 +65,7 @@ UNESCAPE_RE_SKELETON = r'''
         (?:\\\\)*
     )
     # Our replace character is 0
-    \\{0}
+    \\[{0}]
 '''
 
 class KeySplitter(object):
@@ -150,6 +154,16 @@ def _decode_chars(s, chars):
 
     return s
 
+def decode_key_value(key, value):
+    key = _decode_chars(
+        key, KEY_ESCAPED_CHARACTERS
+    ).decode('unicode_escape')
+    value = _decode_chars(
+        value, VALUE_ESCAPED_CHARACTERS
+    ).decode('unicode_escape')
+
+    return key, value
+
 def _blank_line_stripping_helper(iterable):
     """Skips blank lines as described in java.util.Properties:
         A natural line that contains only white space characters is considered
@@ -203,7 +217,17 @@ def _line_continuation_helper(iterable):
 
 def load(file_like_object):
     """Loads a minecraft configuration from a file-like object."""
-    print 'hello world'
+    values = {}
+    for line in _line_continuation_helper(
+        _comment_stripping_helper(
+            _blank_line_stripping_helper(file_like_object)
+        )
+    ):
+        key_encoded, value_encoded = KeySplitter(line).split()
+        key, value = decode_key_value(key_encoded, value_encoded)
+        values[key] = value
+
+    return values
 
 def loads(s):
     """Loads a minecraft configuration from a string."""

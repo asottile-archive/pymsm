@@ -54,6 +54,18 @@ class TestUnescapeReSkeleton(ReplaceReTestBase):
         (':', ':'),
     )
 
+class TestUnescapeReWithSpaceWeirdness(ReplaceReTestBase):
+    regex = re.compile(
+        server_properties._load.UNESCAPE_RE_SKELETON.format(' '),
+        re.VERBOSE,
+    )
+    replacement = r'\1 '
+
+    expected = (
+        (r'\=', '\='),
+        (r'\ ', ' '),
+    )
+
 class TestKeySplitter(T.TestCase):
 
     # Tuple of tuples of (input, output_key, output_value)
