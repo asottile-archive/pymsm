@@ -2,14 +2,14 @@
 import re
 import testify as T
 
-from testing.base_classes.regex import BooleanMatchReTestBase
+from testing.base_classes.regex import BooleanSearchReTestBase
 from testing.base_classes.regex import ReplaceReTestBase
 
-class TestBooleanMatchReTestBase(T.TestCase):
+class TestBooleanSearchReTestBase(T.TestCase):
 
     def test_passing(self):
 
-        class PassingClass(BooleanMatchReTestBase):
+        class PassingClass(BooleanSearchReTestBase):
             regex = re.compile('[A-Za-z]')
             expected = (
                 ('A', True),
@@ -20,7 +20,7 @@ class TestBooleanMatchReTestBase(T.TestCase):
 
     def test_failing(self):
 
-        class FailingClass(BooleanMatchReTestBase):
+        class FailingClass(BooleanSearchReTestBase):
             regex = re.compile('[a-z]')
             expected = (
                 ('A', True),

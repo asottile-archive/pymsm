@@ -4,10 +4,10 @@ import testify as T
 
 import server_properties._load
 from server_properties.exceptions import InvalidPropertiesFileError
-from testing.base_classes.regex import BooleanMatchReTestBase
+from testing.base_classes.regex import BooleanSearchReTestBase
 from testing.base_classes.regex import ReplaceReTestBase
 
-class TestCommentRe(BooleanMatchReTestBase):
+class TestCommentRe(BooleanSearchReTestBase):
 
     regex = server_properties._load.COMMENT_RE
 
@@ -20,7 +20,7 @@ class TestCommentRe(BooleanMatchReTestBase):
         ('foo=bar!this is not a comment', False),
     )
 
-class TestLineContinuationRe(BooleanMatchReTestBase):
+class TestLineContinuationRe(BooleanSearchReTestBase):
 
     regex = server_properties._load.LINE_CONTINUATION_RE
 
@@ -28,6 +28,7 @@ class TestLineContinuationRe(BooleanMatchReTestBase):
 
     expected = (
         ('', False),
+        (backslash, True),
         ('foo', False),
         ('foo' + backslash * 1, True),
         ('foo' + backslash * 2, False),
@@ -36,20 +37,21 @@ class TestLineContinuationRe(BooleanMatchReTestBase):
 
 class TestUnescapeReSkeleton(ReplaceReTestBase):
     regex = re.compile(
-        server_properties._load.UNESCAPE_RE_SKELETON.format('@'),
+        server_properties._load.UNESCAPE_RE_SKELETON.format(':'),
         re.VERBOSE,
     )
     replacement = r'\1~'
 
     expected = (
-        (r'\@', '~'),
-        (r'\\\@', r'\\~'),
+        (r'\:', '~'),
+        (r'aa\:', 'aa~'),
+        (r'\\\:', r'\\~'),
         # Sadface, I can't get this one to replace correctly, I'll have to
         # replace in a loop instead it appears
-        # (r'\@\@', '~~'),
+        # (r'\:\:', '~~'),
         # No replace here!
-        (r'\\\\@', r'\\\\@'),
-        ('@', '@'),
+        (r'\\\\:', r'\\\\:'),
+        (':', ':'),
     )
 
 class TestKeySplitter(T.TestCase):
@@ -103,6 +105,18 @@ class TestKeySplitter(T.TestCase):
                         input, expected_key, key, expected_value, value
                     )
                 )
+
+class TestDecodeChars(T.TestCase):
+
+    def test_decode_chars_single_char(self):
+        input = 'foo\=bar\=baz'
+        ret = server_properties._load._decode_chars(input, ('=',))
+        T.assert_equal(ret, 'foo=bar=baz')
+
+    def test_decode_chars_multiple_chars(self):
+        input = r'foo\=\:bar\=\:baz'
+        ret = server_properties._load._decode_chars(input, ('=', ':'))
+        T.assert_equal(ret, 'foo=:bar=:baz')
 
 class TestBlankLineStrippingHelper(T.TestCase):
 

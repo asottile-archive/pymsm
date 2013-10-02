@@ -10,17 +10,10 @@ from server_properties.exceptions import InvalidPropertiesFileError
 # line
 LINE_CONTINUATION_RE = re.compile(
     r'''
-        # beginning of string
-        ^.*
-        # A non-backslash character
-        [^\\]
+        # beginning of string or non backslash character
+        (\A|[^\\])
         # An odd number of backslashes
-        (
-            # A backslash character
-            [\\]
-            # Chunk of even number of backslashes
-            (\\\\)*
-        )
+        [\\](\\\\)*
         # Terminating the string
         $
     ''',
@@ -138,6 +131,25 @@ class KeySplitter(object):
             self._advance()
         return self._get_key_and_value()
 
+
+def _decode_chars(s, chars):
+    """Decodes characters in chars escaped by a \."""
+    def unescape_char(str_to_replace, char_to_replace):
+        """Unescapes a single character on a string."""
+        unescape_re = re.compile(
+            UNESCAPE_RE_SKELETON.format(char_to_replace),
+            re.VERBOSE,
+        )
+        unescape_replace = r'\1{0}'.format(char_to_replace)
+        while unescape_re.search(str_to_replace):
+            str_to_replace = unescape_re.sub(unescape_replace, str_to_replace)
+        return str_to_replace
+
+    for char in chars:
+        s = unescape_char(s, char)
+
+    return s
+
 def _blank_line_stripping_helper(iterable):
     """Skips blank lines as described in java.util.Properties:
         A natural line that contains only white space characters is considered
@@ -157,7 +169,7 @@ def _comment_stripping_helper(iterable):
         iterable - An iterable of lines
     """
     for line in iterable:
-        if not COMMENT_RE.match(line):
+        if not COMMENT_RE.search(line):
             yield line
 
 def _line_continuation_helper(iterable):
@@ -178,7 +190,7 @@ def _line_continuation_helper(iterable):
         except StopIteration:
             return
 
-        while LINE_CONTINUATION_RE.match(next):
+        while LINE_CONTINUATION_RE.search(next):
             # Strip of end line character
             next = next[:-1]
             # Add the next line

@@ -1,8 +1,8 @@
 
 import testify as T
 
-class BooleanMatchReTestBase(T.TestCase):
-    """A base class for testing a matching regex."""
+class BooleanSearchReTestBase(T.TestCase):
+    """A base class for testing a searching regex."""
     __test__ = False
 
     # Assign regex
@@ -18,8 +18,8 @@ class BooleanMatchReTestBase(T.TestCase):
 
     def test_regex(self):
         for test, expected in self.expected:
-            match = self.regex.match(test)
-            if bool(match) != expected:
+            search = self.regex.search(test)
+            if bool(search) != expected:
                 raise AssertionError(
                     'Failed test of regex {0}.\n'
                     'Test: {1}\n'
