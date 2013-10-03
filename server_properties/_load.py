@@ -154,7 +154,7 @@ def _decode_chars(s, chars):
 
     return s
 
-def decode_key_value(key, value):
+def _decode_key_value(key, value):
     key = _decode_chars(
         key, KEY_ESCAPED_CHARACTERS
     ).decode('unicode_escape')
@@ -224,7 +224,7 @@ def load(file_like_object):
         )
     ):
         key_encoded, value_encoded = KeySplitter(line).split()
-        key, value = decode_key_value(key_encoded, value_encoded)
+        key, value = _decode_key_value(key_encoded, value_encoded)
         values[key] = value
 
     return values

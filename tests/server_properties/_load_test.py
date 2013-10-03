@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import re
 import testify as T
@@ -129,6 +130,23 @@ class TestDecodeChars(T.TestCase):
         input = r'foo\=\:bar\=\:baz'
         ret = server_properties._load._decode_chars(input, ('=', ':'))
         T.assert_equal(ret, 'foo=:bar=:baz')
+
+class TestDecodeKeyValue(T.TestCase):
+
+    def test_decode_unicode(self):
+        key, value = server_properties._load._decode_key_value(
+            r'\u2603', r'\u2603',
+        )
+        T.assert_equal(key, u'☃')
+        T.assert_equal(value, u'☃')
+
+    def test_decode_escaped_characters(self):
+        key, value = server_properties._load._decode_key_value(
+            r'\\\=\ \:\#\!', 'bar'
+        )
+        T.assert_equal(key, r'\= :#!')
+        T.assert_equal(value, 'bar')
+
 
 class TestBlankLineStrippingHelper(T.TestCase):
 
