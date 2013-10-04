@@ -1,10 +1,13 @@
 
+import cStringIO
 import re
 
-from server_properties.exceptions import InvalidPropertiesFileError
+class InvalidPropertiesFileError(ValueError): pass
 
-# This attempts to satisfy the spec of java.util.Properties
-# Basing implementation off of http://docs.oracle.com/javase/6/docs/api/java/util/Properties.html
+# This interface roughly follows that of the interface for simplejson
+# The implementation attempts to follow as closely to that of
+# java.util.Properties
+# http://docs.oracle.com/javase/6/docs/api/java/util/Properties.html
 
 # Line continuation regex matches an odd number of backslashes terminating a
 # line
@@ -154,13 +157,39 @@ def _decode_chars(s, chars):
 
     return s
 
+def _encode_chars(s, chars):
+    """Encodes s with characters in chars by escaping with a \."""
+    for char in chars:
+        s = s.replace(char, r'\{0}'.format(char))
+
+    return s
+
+def _encode_unicode(s):
+    """From java.util.Properties:
+    Characters less than \u0020 and characters greater than \u007E in property
+    keys or values are written as \uxxxx for the appropriate hexadecimal value
+    xxxx.
+    """
+    return ''.join(
+        c if 0x20 <= ord(c) <= 0x7e else r'\u%04x' % ord(c)
+        for c in s
+    )
+
 def _decode_key_value(key, value):
-    key = _decode_chars(
-        key, KEY_ESCAPED_CHARACTERS
-    ).decode('unicode_escape')
-    value = _decode_chars(
-        value, VALUE_ESCAPED_CHARACTERS
-    ).decode('unicode_escape')
+    key = _decode_chars(key, KEY_ESCAPED_CHARACTERS)
+    key = key.decode('unicode_escape')
+    value = _decode_chars(value, VALUE_ESCAPED_CHARACTERS)
+    value = value.decode('unicode_escape')
+
+    return key, value
+
+def _encode_key_value(key, value):
+    key = key.encode('unicode_escape')
+    key = _encode_chars(key, KEY_ESCAPED_CHARACTERS)
+    key = _encode_unicode(key)
+    value =  value.encode('unicode_escape')
+    value = _encode_chars(value, VALUE_ESCAPED_CHARACTERS)
+    value = _encode_unicode(value)
 
     return key, value
 
@@ -215,20 +244,42 @@ def _line_continuation_helper(iterable):
 
         yield next
 
-def load(file_like_object):
-    """Loads a minecraft configuration from a file-like object."""
-    values = {}
-    for line in _line_continuation_helper(
-        _comment_stripping_helper(
-            _blank_line_stripping_helper(file_like_object)
-        )
-    ):
-        key_encoded, value_encoded = KeySplitter(line).split()
-        key, value = _decode_key_value(key_encoded, value_encoded)
-        values[key] = value
+class Properties(dict):
+    """A Properties object mirrors that of java's java.util.Properties
 
-    return values
+    It is a series of key-values that is stored in a file.
+    """
 
-def loads(s):
-    """Loads a minecraft configuration from a string."""
-    return load(s.splitlines())
+    @classmethod
+    def load(cls, file_like_object):
+        """Loads a Properties object from a file-like object."""
+        values = {}
+        for line in _line_continuation_helper(
+            _comment_stripping_helper(
+                _blank_line_stripping_helper(file_like_object)
+            )
+        ):
+            key_encoded, value_encoded = KeySplitter(line).split()
+            key, value = _decode_key_value(key_encoded, value_encoded)
+            values[key] = value
+
+        return cls(values)
+
+    @classmethod
+    def loads(cls, s):
+        """Loads a Properties object from a string."""
+        return cls.load(s.splitlines())
+
+    def dump(self, file_like_object):
+        """Saves this instance to a file-like object."""
+        for key, value in self.iteritems():
+            key_encoded, value_encoded = _encode_key_value(key, value)
+            file_like_object.write(
+                '{0}={1}\n'.format(key_encoded, value_encoded)
+            )
+
+    def dumps(self):
+        """Returns this instance as a string."""
+        with cStringIO.StringIO() as stringio:
+            self.dump(stringio)
+            return stringio.getvalue()
