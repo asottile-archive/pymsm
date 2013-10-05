@@ -1,4 +1,5 @@
 
+import contextlib
 import cStringIO
 import re
 
@@ -280,6 +281,6 @@ class Properties(dict):
 
     def dumps(self):
         """Returns this instance as a string."""
-        with cStringIO.StringIO() as stringio:
+        with contextlib.closing(cStringIO.StringIO()) as stringio:
             self.dump(stringio)
             return stringio.getvalue()
