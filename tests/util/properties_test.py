@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os.path
 import re
 import testify as T
 
+import config.application
 import util.properties
 from util.properties import InvalidPropertiesFileError
 from testing.base_classes.regex import BooleanSearchReTestBase
@@ -199,3 +201,35 @@ class TestLineContinuationHelper(T.TestCase):
         lines = ['foo\\']
         with T.assert_raises(InvalidPropertiesFileError):
             list(util.properties._line_continuation_helper(lines))
+
+@T.suite('integration')
+class TestPropertiesLoadIntegration(T.TestCase):
+
+    expected_data =  {
+        'generator-settings': '',
+        'allow-nether': 'true',
+        'level-name': 'world',
+        'enable-query': 'false',
+        'allow-flight': 'false',
+        'server-port': '25565',
+        'foo ': 'bar',
+    }
+
+    def _get_file_path(self):
+        return os.path.join(
+            config.application.APP_ROOT,
+            'testing/data/files/sample_server.properties',
+        )
+
+    def test_load_from_given_file(self):
+        with open(self._get_file_path(), 'r') as file:
+            ret = util.properties.Properties.load(file)
+
+        T.assert_equal(ret, self.expected_data)
+
+    def test_load_from_file_string(self):
+        with open(self._get_file_path(), 'r') as file:
+            file_contents = file.read()
+
+        ret = util.properties.Properties.loads(file_contents)
+        T.assert_equal(ret, self.expected_data)

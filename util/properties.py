@@ -257,7 +257,9 @@ class Properties(dict):
         values = {}
         for line in _line_continuation_helper(
             _comment_stripping_helper(
-                _blank_line_stripping_helper(file_like_object)
+                _blank_line_stripping_helper(
+                    line.rstrip('\r\n') for line in file_like_object
+                )
             )
         ):
             key_encoded, value_encoded = KeySplitter(line).split()
