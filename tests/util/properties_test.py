@@ -133,6 +133,52 @@ class TestDecodeChars(T.TestCase):
         ret = util.properties._decode_chars(input, ('=', ':'))
         T.assert_equal(ret, 'foo=:bar=:baz')
 
+class TestEncodeChars(T.TestCase):
+
+    def test_encode_chars_single_char(self):
+        input = 'foo=bar=baz'
+        ret = util.properties._encode_chars(input, ('=',))
+        T.assert_equal(ret, 'foo\=bar\=baz')
+
+    def test_encode_chars_multiple_chars(self):
+        input = 'foo=:bar=:baz'
+        ret = util.properties._encode_chars(input, ('=', ':'))
+        T.assert_equal(ret, 'foo\=\:bar\=\:baz')
+
+class TestEncodeDecodeRoundTrip(T.TestCase):
+
+    strs = (
+        'foo=bar',
+        'foo:bar',
+        'foo=:bar',
+        ':=:=====:::',
+    )
+
+    chars = ('=', ':',)
+
+    def test_encode_decode_round_trip(self):
+        for s in self.strs:
+            encoded = util.properties._encode_chars(s, self.chars)
+            decoded = util.properties._decode_chars(encoded, self.chars)
+            T.assert_equal(decoded, s)
+
+class TestEncodeUnicodeEscapes(T.TestCase):
+
+    expected = (
+        ('\x1f', r'\u001f'),
+        ('\x20', ' ',),
+        ('\x21', '!',),
+        ('\x7e', '~',),
+        ('\x7f', r'\u007f'),
+    )
+
+    def test_encode_unicode_escapes(self):
+        for input, output in self.expected:
+            T.assert_equal(
+                output,
+                util.properties._encode_unicode_escapes(input),
+            )
+
 class TestDecodeKeyValue(T.TestCase):
 
     def test_decode_unicode(self):

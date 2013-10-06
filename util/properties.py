@@ -165,7 +165,7 @@ def _encode_chars(s, chars):
 
     return s
 
-def _encode_unicode(s):
+def _encode_unicode_escapes(s):
     """From java.util.Properties:
     Characters less than \u0020 and characters greater than \u007E in property
     keys or values are written as \uxxxx for the appropriate hexadecimal value
@@ -187,10 +187,10 @@ def _decode_key_value(key, value):
 def _encode_key_value(key, value):
     key = key.encode('unicode_escape')
     key = _encode_chars(key, KEY_ESCAPED_CHARACTERS)
-    key = _encode_unicode(key)
+    key = _encode_unicode_escapes(key)
     value =  value.encode('unicode_escape')
     value = _encode_chars(value, VALUE_ESCAPED_CHARACTERS)
-    value = _encode_unicode(value)
+    value = _encode_unicode_escapes(value)
 
     return key, value
 
