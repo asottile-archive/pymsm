@@ -196,6 +196,23 @@ class TestDecodeKeyValue(T.TestCase):
         T.assert_equal(value, 'bar')
 
 
+class TestEncodeKeyValue(T.TestCase):
+
+    def test_encode_unicode(self):
+        key, value = util.properties._encode_key_value(
+            u'☃\x1f', u'☃\x1f',
+        )
+        T.assert_equal(key, r'\u2603\u001f')
+        T.assert_equal(value, r'\u2603\u001f')
+
+    def test_encode_escape_characters(self):
+        key, value = util.properties._encode_key_value(
+            '\= :#!', 'foo bar',
+        )
+        T.assert_equal(key, r'\\\=\ \:\#\!')
+        T.assert_equal(value, 'foo bar')
+
+
 class TestBlankLineStrippingHelper(T.TestCase):
 
     def test_blank_line_stripping_helper(test):

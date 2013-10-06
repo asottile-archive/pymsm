@@ -185,10 +185,10 @@ def _decode_key_value(key, value):
     return key, value
 
 def _encode_key_value(key, value):
-    key = key.encode('unicode_escape')
+    key = _encode_chars(key, ('\\',))
     key = _encode_chars(key, KEY_ESCAPED_CHARACTERS)
     key = _encode_unicode_escapes(key)
-    value =  value.encode('unicode_escape')
+    value = _encode_chars(value, ('\\',))
     value = _encode_chars(value, VALUE_ESCAPED_CHARACTERS)
     value = _encode_unicode_escapes(value)
 
