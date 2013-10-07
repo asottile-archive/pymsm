@@ -9,6 +9,7 @@ import util.properties
 from util.properties import InvalidPropertiesFileError
 from testing.base_classes.regex import BooleanSearchReTestBase
 from testing.base_classes.regex import ReplaceReTestBase
+from testing.base_classes.tempdir_test_case import TempdirTestCase
 
 class TestCommentRe(BooleanSearchReTestBase):
 
@@ -268,7 +269,7 @@ class TestLineContinuationHelper(T.TestCase):
 @T.suite('integration')
 class TestPropertiesLoadIntegration(T.TestCase):
 
-    expected_data =  {
+    expected_data = {
         'generator-settings': '',
         'allow-nether': 'true',
         'level-name': 'world',
@@ -296,3 +297,28 @@ class TestPropertiesLoadIntegration(T.TestCase):
 
         ret = util.properties.Properties.loads(file_contents)
         T.assert_equal(ret, self.expected_data)
+
+@T.suite('integration')
+class TestPropertiesDumpIntegration(TempdirTestCase):
+
+    data = util.properties.Properties({
+        'generator-settings': '',
+        'allow-nether': 'true',
+        'foo': 'bar',
+    })
+
+    def _get_file_path(self):
+        return os.path.join(self.tempdir, 'temp.properties')
+
+    def test_dump_to_file(self):
+        with open(self._get_file_path(), 'w') as tempfile:
+            self.data.dump(tempfile)
+
+        with open(self._get_file_path(), 'r') as tempfile:
+            props = util.properties.Properties.load(tempfile)
+            T.assert_equal(props, self.data)
+
+    def test_dump_to_string(self):
+        data_str = self.data.dumps()
+        props = util.properties.Properties.loads(data_str)
+        T.assert_equal(props, self.data)
