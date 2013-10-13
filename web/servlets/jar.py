@@ -5,7 +5,7 @@ import simplejson
 from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import get_user_jars
 from util.decorators import require_internal
-from util.flask_helpers import render_template
+from util.flask_helpers import render_template_mako
 from presentation.user_jar import UserJar
 
 jar = flask.Blueprint(
@@ -28,7 +28,7 @@ def jar_home(jar_type, user_jar_name):
         user_jar_name,
     )
 
-    return render_template('home.htm', user_jar=user_jar_presenter)
+    return render_template_mako('jar/home.mako', user_jar=user_jar_presenter)
 
 @jar.route('/jar/<jar_type>/<user_jar_name>/update', methods=['POST'])
 @require_internal
