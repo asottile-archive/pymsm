@@ -9,6 +9,7 @@ from jar_downloader.discovery import get_user_jars
 from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
 from util.flask_helpers import render_template
+from util.flask_helpers import render_template_mako
 from presentation.jar_downloader import JarDownloader
 from schemaform.form import Form
 from schemaform.helpers import el
@@ -63,8 +64,8 @@ def get_jar_create_form(jar_type):
 def jar_list():
     jar_downloaders = get_jar_downloader_presenters()
     user_jars = get_user_jars()
-    return render_template(
-        'jar_list.htm',
+    return render_template_mako(
+        'jar_creation/jar_list.mako',
         jar_downloaders=jar_downloaders,
         user_jars=user_jars,
     )
