@@ -7,7 +7,8 @@ import testify as T
 from util.auto_namedtuple import auto_namedtuple
 import util.flask_helpers
 from util.flask_helpers import is_internal
-from util.flask_helpers import render_template
+from util.flask_helpers import render_template_mako
+from util.flask_helpers import template_lookup
 
 class TestIsInternal(T.TestCase):
     """Tests the @require_internal decorator."""
@@ -34,25 +35,29 @@ class TestRenderTemplate(T.TestCase):
     def setup_mocks(self):
         with contextlib.nested(
             mock.patch.object(util.flask_helpers, 'is_internal', autospec=True),
-            mock.patch.object(flask, 'render_template', autospec=True),
+            mock.patch.object(
+                template_lookup, 'get_template', autospec=True
+            ),
         ) as (
             self.is_internal_mock,
-            self.render_template_mock,
+            self.get_template_mock,
         ):
             yield
 
     def test_render_template(self):
-        template = object()
         kwargs = {
             'foo': 'bar',
             'baz': 'womp',
         }
-        ret = render_template(template, **kwargs)
+        ret = render_template_mako(mock.sentinel.template, **kwargs)
 
-        T.assert_equal(ret, self.render_template_mock.return_value)
+        T.assert_equal(
+            ret,
+            self.get_template_mock.return_value.render.return_value,
+        )
         self.is_internal_mock.assert_called_once_with()
-        self.render_template_mock.assert_called_once_with(
-            template,
+        self.get_template_mock.assert_called_once_with(mock.sentinel.template)
+        self.get_template_mock.return_value.render.assert_called_once_with(
             is_internal=self.is_internal_mock.return_value,
             **kwargs
         )

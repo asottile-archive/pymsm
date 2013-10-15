@@ -3,7 +3,6 @@ import flask
 import os.path
 
 import config.application
-from util.flask_helpers import render_template
 from util.flask_helpers import render_template_mako
 from web.servlets.jar import jar
 from web.servlets.jar_creation import jar_creation
@@ -20,7 +19,6 @@ app.register_blueprint(jar)
 @app.route('/', methods=['GET'])
 def index():
     return render_template_mako('index.mako')
-    return render_template('index.htm')
 
 @app.route('/<path:path>')
 def catch_all(path):

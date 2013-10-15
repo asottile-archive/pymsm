@@ -8,7 +8,6 @@ from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import get_user_jars
 from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
-from util.flask_helpers import render_template
 from util.flask_helpers import render_template_mako
 from presentation.jar_downloader import JarDownloader
 from schemaform.form import Form
@@ -74,7 +73,10 @@ def jar_list():
 @require_internal
 def new_jar(jar_type):
     jar_form_markup = get_jar_create_form(jar_type)
-    return render_template('new_jar.htm', jar_form_markup=jar_form_markup)
+    return render_template_mako(
+        'jar_creation/new_jar.mako',
+        jar_form_markup=jar_form_markup,
+    )
 
 @jar_creation.route('/create_jar/<jar_type>', methods=['POST'])
 @require_internal
