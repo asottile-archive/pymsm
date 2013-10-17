@@ -2,7 +2,7 @@
 import flask
 import functools
 
-from util.flask_helpers import is_internal
+from web.flask_helpers import is_internal
 
 _NONE_PASSED = object()
 

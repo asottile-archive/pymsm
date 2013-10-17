@@ -3,7 +3,7 @@ import flask
 import os.path
 
 import config.application
-from util.flask_helpers import render_template_mako
+from web.flask_helpers import render_template_mako
 from web.servlets.jar import jar
 from web.servlets.jar_creation import jar_creation
 

@@ -2,8 +2,6 @@
 import flask
 import mako.lookup
 
-# TODO: this file belongs in web
-
 template_lookup = mako.lookup.TemplateLookup(
     directories=['web/templates'],
 )

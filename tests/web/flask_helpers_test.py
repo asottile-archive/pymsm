@@ -5,10 +5,10 @@ import mock
 import testify as T
 
 from util.auto_namedtuple import auto_namedtuple
-import util.flask_helpers
-from util.flask_helpers import is_internal
-from util.flask_helpers import render_template_mako
-from util.flask_helpers import template_lookup
+import web.flask_helpers
+from web.flask_helpers import is_internal
+from web.flask_helpers import render_template_mako
+from web.flask_helpers import template_lookup
 
 class TestIsInternal(T.TestCase):
     """Tests the @require_internal decorator."""
@@ -34,7 +34,7 @@ class TestRenderTemplate(T.TestCase):
     @T.setup_teardown
     def setup_mocks(self):
         with contextlib.nested(
-            mock.patch.object(util.flask_helpers, 'is_internal', autospec=True),
+            mock.patch.object(web.flask_helpers, 'is_internal', autospec=True),
             mock.patch.object(
                 template_lookup, 'get_template', autospec=True
             ),

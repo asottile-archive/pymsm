@@ -8,11 +8,11 @@ from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import get_user_jars
 from jar_downloader.helpers import create_jar_directory
 from util.decorators import require_internal
-from util.flask_helpers import render_template_mako
 from presentation.jar_downloader import JarDownloader
 from schemaform.form import Form
 from schemaform.helpers import el
 from schemaform.single_input_property import SingleInputProperty
+from web.flask_helpers import render_template_mako
 
 jar_creation = flask.Blueprint(
     'jar_creation', __name__, template_folder='../templates/jar_creation'

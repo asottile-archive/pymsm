@@ -5,8 +5,8 @@ import simplejson
 from jar_downloader.discovery import get_jar_downloader_map
 from jar_downloader.discovery import get_user_jars
 from util.decorators import require_internal
-from util.flask_helpers import render_template_mako
 from presentation.user_jar import UserJar
+from web.flask_helpers import render_template_mako
 
 jar = flask.Blueprint(
     'jar', __name__, template_folder='../templates/jar'
