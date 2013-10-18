@@ -245,6 +245,43 @@ def _line_continuation_helper(iterable):
 
         yield next
 
+class TypedGetterSetter(object):
+    """Interface for setting / getting typed values on a Properties object."""
+
+    def __init__(self, properties_dict, value_type, to_str=unicode, from_str=None):
+        """Initialize a TypedGetterSetter.
+
+        Args:
+            properties_dict - Dict to set / get values from
+            value_type - Type to get/set
+            to_str - Function to translate the object to basestring (defaults to
+               unicode).
+            from_str - Function to translate the object from basestring
+                (defaults to value_type)
+        """
+        self.__properties_dict = properties_dict
+        self.__value_type = value_type
+        self.__to_str = to_str
+        self.__from_str = from_str or value_type
+
+    def __getitem__(self, key):
+        return self.__from_str(self.__properties)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, basestring):
+            raise ValueError(
+                'Key needs to be a string, got {0}'.format(type(key).__name__),
+            )
+        if not isinstance(value, self.__value_type):
+            raise ValueError(
+                 'Value needs to be a {0}, got {1}'.format(
+                     self.__value_type.__name__,
+                     type(value).__name__,
+                 )
+             )
+
+        self.__properties_dict[key] = self.__to_str(value)
+
 class Properties(dict):
     """A Properties object mirrors that of java's java.util.Properties
 
